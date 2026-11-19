@@ -440,16 +440,34 @@ agent-notch, Dynamic Notch for Windows, Dynamic Island for Windows, Windows Dyna
 
 ## Agentic Brain
 
-agent-notch includes an agent brain: an AI worker behind the **Agent** slide
-(Settings › Agent) and a Settings page of the same name.
+agent-notch includes an agent brain: an AI worker you can chat with from the
+**Agent slide** in the notch or from **Settings › Agent**.
+
+### Get started in three steps
+
+1. Start [Ollama](https://ollama.com) on this PC and pull a model, e.g.
+   `ollama pull llama3.2`.
+2. Open **Settings › Agent**. The models on your machine are fetched
+   automatically from `http://127.0.0.1:11434/v1/models` — pick one from the
+   **Model** dropdown. Selecting it turns the agent on and immediately loads
+   that model into Ollama with a **10-minute keep_alive**, so your first prompt
+   is fast. **Reload model** warms it again at any time.
+3. Type a message. Enter sends; Shift+Enter adds a line. If Ollama is off, the
+   page says so and **Refresh models** tries again.
+
+You can also click the Agent slide's message box in the notch and type there.
+When the brain wants to click, type or run something, the slide shows
+**Approve / Deny** buttons (the same buttons appear in Settings). The full
+conversation stays visible in both places.
 
 - **Provider chain** — OpenRouter, Groq, or any OpenAI-compatible server
   (LM Studio, llama.cpp) plus local Ollama at `127.0.0.1:11434/v1` by default.
   Providers are tried in order; one that runs out (429/5xx/network) is marked
-  down and the next takes over automatically.
+  down and the next takes over automatically. Hosted providers live under
+  **Advanced** in Settings › Agent.
 - **API keys** are read from environment variables (never stored in
   config.json). Mark a provider's model as the *decision model* to have a
-  fast local model parse your speech into actions.
+  fast local model parse your requests into actions.
 - **Screen awareness** — the brain reads the foreground window, clipboard and
   (when a vision-capable provider is configured) screenshots of your screens.
 - **Desktop control** — click, type, chord keys, scroll, drag, window
@@ -458,5 +476,5 @@ agent-notch includes an agent brain: an AI worker behind the **Agent** slide
   ask. Autonomous mode runs mutations except irreversible ones
   (`execute_command`).
 
-Chat with the agent in Settings › Agent. Voice input/output is planned for
-the next stage (local TTS/STT via whisper.cpp + Piper/kokoro-style servers).
+Voice input/output is planned for a later stage (local TTS/STT via whisper.cpp
++ Piper/kokoro-style servers).

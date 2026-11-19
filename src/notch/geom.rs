@@ -317,6 +317,41 @@ pub fn slide_body(panel: NotchShape) -> D2D_RECT_F {
     }
 }
 
+/// The Agent slide's message box: a full-width row at the bottom of the body.
+pub fn agent_input_rect(body: D2D_RECT_F) -> D2D_RECT_F {
+    let h = 34.0;
+    D2D_RECT_F {
+        left: body.left + 6.0,
+        top: body.bottom - h,
+        right: body.right - 6.0,
+        bottom: body.bottom,
+    }
+}
+
+/// The Agent slide's Approve / Deny buttons, shown only while a tool is
+/// waiting. They sit directly above the message box.
+pub fn agent_approval_buttons(body: D2D_RECT_F) -> (D2D_RECT_F, D2D_RECT_F) {
+    let input = agent_input_rect(body);
+    let (bw, bh, gap) = (92.0, 28.0, 10.0);
+    let cx = (body.left + body.right) * 0.5;
+    let top = input.top - bh - 10.0;
+    let left = cx - gap * 0.5 - bw;
+    (
+        D2D_RECT_F {
+            left,
+            top,
+            right: left + bw,
+            bottom: top + bh,
+        },
+        D2D_RECT_F {
+            left: cx + gap * 0.5,
+            top,
+            right: cx + gap * 0.5 + bw,
+            bottom: top + bh,
+        },
+    )
+}
+
 /// Previous / play-pause / next on the closed pill's right end, when it is
 /// showing Now Playing: centres and radius, left to right.
 pub fn pill_media_buttons(shape: NotchShape) -> [(f32, f32, f32); 3] {

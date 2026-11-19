@@ -600,6 +600,11 @@ pub enum Hit {
     NotifClear,
     NotifBack,
     NotifDismiss,
+    /// The Agent slide's message box.
+    AgentChat,
+    /// Approve / deny the tool the agent is waiting on.
+    AgentApprove,
+    AgentDeny,
 }
 
 /// A clickable target and where it is.

@@ -24,6 +24,8 @@ pub enum EditTarget {
     Focus,
     /// A new item for the Status slide's short list.
     NewItem,
+    /// The Agent slide's chat message.
+    AgentChat,
 }
 
 /// A short confirmation shown over the notch: the action itself is invisible
@@ -623,6 +625,23 @@ impl NotchState {
         self.caret_clock = 0.0;
     }
 
+    /// Start typing a message to the agent.
+    pub fn begin_agent_chat(&mut self) {
+        if self.editing {
+            return;
+        }
+        self.editing = true;
+        self.edit_target = EditTarget::AgentChat;
+        self.edit_buffer.clear();
+        self.caret_on = true;
+        self.caret_clock = 0.0;
+    }
+
+    /// Whether the Agent slide's input is being typed into.
+    pub fn is_agent_chat(&self) -> bool {
+        self.editing && self.edit_target == EditTarget::AgentChat
+    }
+
     /// Start typing a new item for the short list.
     pub fn begin_add(&mut self) {
         if self.editing {
@@ -677,8 +696,13 @@ impl NotchState {
         if !self.editing {
             return;
         }
-        // Reasonable ceiling: the focus line is one thought, not a paragraph.
-        if self.edit_buffer.chars().count() >= 160 {
+        // The focus line is one thought; a prompt to the agent can be longer.
+        let limit = if self.edit_target == EditTarget::AgentChat {
+            480
+        } else {
+            160
+        };
+        if self.edit_buffer.chars().count() >= limit {
             return;
         }
         if !ch.is_control() {
@@ -1053,6 +1077,23 @@ mod tests {
         state.begin_add();
         assert!(!state.commit_edit(&mut cfg));
         assert_eq!(cfg.status.items.len(), before + 1);
+    }
+
+    #[test]
+    fn agent_chat_buffer_typing_and_cancel() {
+        let cfg = AppConfig::default();
+        let mut state = NotchState::new(&cfg);
+        state.begin_agent_chat();
+        assert!(state.is_agent_chat());
+        for ch in "what app has focus?".chars() {
+            state.type_char(ch);
+        }
+        assert_eq!(state.edit_buffer, "what app has focus?");
+        state.backspace();
+        assert_eq!(state.edit_buffer, "what app has focu");
+        state.cancel_edit();
+        assert!(!state.is_agent_chat());
+        assert!(state.edit_buffer.is_empty());
     }
 
     #[test]

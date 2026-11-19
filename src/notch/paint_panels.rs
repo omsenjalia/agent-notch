@@ -987,26 +987,85 @@ impl Painter {
         true
     }
 
+    /// One transcript line: a short prefix and the message, tinted by role.
+    fn agent_line(
+        event: &crate::agent::AgentEvent,
+        accent: theme::Rgba,
+        pal: &theme::Palette,
+    ) -> (String, theme::Rgba) {
+        match event {
+            crate::agent::AgentEvent::UserMessage(text) => (format!("You  {text}"), accent),
+            crate::agent::AgentEvent::Answer(text) => (format!("Agent  {text}"), pal.text_hi),
+            crate::agent::AgentEvent::ToolCall {
+                description, tool, ..
+            } => (format!("→ {description} ({tool})"), pal.text_mid),
+            crate::agent::AgentEvent::ToolResult { tool, output, .. } => {
+                (format!("← {tool}  {output}"), pal.text_mid)
+            }
+            crate::agent::AgentEvent::ToolSkipped { tool } => {
+                (format!("✕ {tool} — denied"), pal.text_lo)
+            }
+            crate::agent::AgentEvent::ApprovalRequired { tool, .. } => {
+                (format!("⚠ {tool} wants to run"), [0.96, 0.76, 0.38, 1.0])
+            }
+            crate::agent::AgentEvent::Error(error) => {
+                (format!("Error  {error}"), [0.96, 0.55, 0.40, 1.0])
+            }
+        }
+    }
+
     // -- Clipboard --------------------------------------------------------------
 
-    /// The Agent slide: a label and the brain's status. Status comes from
-    /// the global agent host, so this stays zero-work while the brain is idle.
+    /// The Agent slide: a small chat with the brain. Status, transcript and
+    /// approvals all come from the global host, so an idle brain costs nothing.
     pub(super) fn paint_agent_panel(
         &mut self,
         t: &ID2D1DCRenderTarget,
         cfg: &AppConfig,
+        state: &NotchState,
         body: D2D_RECT_F,
         alpha: f32,
     ) {
         let family = &cfg.notch.font_family;
-        let status = crate::agent::global()
-            .map(|host| host.status())
+        let host = crate::agent::global();
+        let status = host
+            .as_ref()
+            .map(|h| h.status())
             .unwrap_or(crate::agent::Status::Idle);
+        let enabled = host.as_ref().map(|h| h.is_enabled()).unwrap_or(false);
         let status_text = match &status {
-            crate::agent::Status::Idle => "Agent: idle".to_owned(),
-            crate::agent::Status::Thinking => "Agent: thinking…".to_owned(),
-            crate::agent::Status::Approval(tool) => format!("Agent: {tool} — approve?"),
+            crate::agent::Status::Idle => "idle",
+            crate::agent::Status::Thinking => "thinking…",
+            crate::agent::Status::Approval(tool) => {
+                return self.paint_agent_approval(t, cfg, state, body, alpha, tool, host.as_deref())
+            }
         };
+
+        let width = body.right - body.left;
+        if !enabled {
+            self.centred_label(
+                t,
+                family,
+                "AGENT",
+                theme::SIZE_LABEL - 1.0,
+                DWRITE_FONT_WEIGHT_EXTRA_BOLD,
+                body,
+                body.top + 8.0,
+                theme::fade(self.pal.text_lo, alpha),
+            );
+            self.centred_label(
+                t,
+                family,
+                "Agent is off — enable it in Settings › Agent",
+                11.0,
+                DWRITE_FONT_WEIGHT_MEDIUM,
+                body,
+                (body.top + body.bottom) * 0.5,
+                theme::fade(self.pal.text_mid, alpha),
+            );
+            return;
+        }
+
         self.centred_label(
             t,
             family,
@@ -1014,19 +1073,225 @@ impl Painter {
             theme::SIZE_LABEL - 1.0,
             DWRITE_FONT_WEIGHT_EXTRA_BOLD,
             body,
-            body.top + 8.0,
+            body.top + 4.0,
             theme::fade(self.pal.text_lo, alpha),
         );
         self.centred_label(
             t,
             family,
-            &status_text,
-            12.0,
+            status_text,
+            10.0,
             DWRITE_FONT_WEIGHT_MEDIUM,
             body,
-            (body.top + body.bottom) * 0.5,
+            body.top + 20.0,
+            theme::fade(self.pal.text_mid, alpha),
+        );
+
+        let input = geom::agent_input_rect(body);
+        let top = body.top + 38.0;
+        let bottom = input.top - 6.0;
+        if bottom > top {
+            self.clip(
+                t,
+                D2D_RECT_F {
+                    left: body.left,
+                    top,
+                    right: body.right,
+                    bottom,
+                },
+            );
+            let lines = host.as_ref().map(|h| h.transcript()).unwrap_or_default();
+            let mut y = top;
+            let accent = cfg.notch.accent;
+            for event in lines
+                .iter()
+                .rev()
+                .take(14)
+                .collect::<Vec<_>>()
+                .into_iter()
+                .rev()
+            {
+                if y + 15.0 > bottom {
+                    break;
+                }
+                let (text, color) = Self::agent_line(event, accent, &self.pal);
+                self.label(
+                    t,
+                    family,
+                    &text,
+                    10.5,
+                    DWRITE_FONT_WEIGHT_MEDIUM,
+                    0.0,
+                    width - 16.0,
+                    body.left + 8.0,
+                    y,
+                    theme::fade(color, alpha),
+                );
+                y += 15.0;
+            }
+            if lines.is_empty() {
+                self.label(
+                    t,
+                    family,
+                    "Ask me about your screen, clipboard or open apps.",
+                    10.5,
+                    DWRITE_FONT_WEIGHT_MEDIUM,
+                    0.0,
+                    width - 16.0,
+                    body.left + 8.0,
+                    top,
+                    theme::fade(self.pal.text_lo, alpha),
+                );
+            }
+            self.unclip(t);
+        }
+        self.paint_agent_input(t, cfg, state, input, alpha);
+    }
+
+    /// The Agent slide while a tool is waiting: the question, Approve / Deny,
+    /// and the same message box underneath.
+    fn paint_agent_approval(
+        &mut self,
+        t: &ID2D1DCRenderTarget,
+        cfg: &AppConfig,
+        state: &NotchState,
+        body: D2D_RECT_F,
+        alpha: f32,
+        tool: &str,
+        host: Option<&crate::agent::Host>,
+    ) {
+        let family = &cfg.notch.font_family;
+        let (approve, deny) = geom::agent_approval_buttons(body);
+        let description = host
+            .and_then(|h| h.pending_approval())
+            .map(|p| p.description)
+            .unwrap_or_default();
+
+        self.centred_label(
+            t,
+            family,
+            "APPROVE?",
+            theme::SIZE_LABEL - 2.0,
+            DWRITE_FONT_WEIGHT_EXTRA_BOLD,
+            body,
+            body.top + 6.0,
+            theme::fade([0.96, 0.76, 0.38, 1.0], alpha),
+        );
+        self.centred_label(
+            t,
+            family,
+            &description,
+            11.0,
+            DWRITE_FONT_WEIGHT_MEDIUM,
+            D2D_RECT_F {
+                left: body.left,
+                top: body.top + 28.0,
+                right: body.right,
+                bottom: approve.top,
+            },
+            body.top + 30.0,
             theme::fade(self.pal.text_hi, alpha),
         );
+
+        for (rect, label, color) in [
+            (&approve, "Approve", cfg.notch.accent),
+            (&deny, "Deny", self.pal.well),
+        ] {
+            self.fill_rrect(t, *rect, 9.0, theme::fade(color, alpha * 0.30));
+            self.stroke_rrect(t, *rect, 9.0, 1.0, theme::fade(color, alpha * 0.7));
+            self.centred_label(
+                t,
+                family,
+                label,
+                11.5,
+                DWRITE_FONT_WEIGHT_SEMI_BOLD,
+                *rect,
+                (rect.top + rect.bottom) * 0.5 - 7.0,
+                theme::fade(self.pal.text_hi, alpha),
+            );
+        }
+        let _ = tool;
+        let input = geom::agent_input_rect(body);
+        self.paint_agent_input(t, cfg, state, input, alpha);
+    }
+
+    /// The input row: an inset well, a hint or the live buffer, and a caret.
+    fn paint_agent_input(
+        &mut self,
+        t: &ID2D1DCRenderTarget,
+        cfg: &AppConfig,
+        state: &NotchState,
+        input: D2D_RECT_F,
+        alpha: f32,
+    ) {
+        let family = &cfg.notch.font_family;
+        let active = state.is_agent_chat();
+        self.fill_rrect(
+            t,
+            input,
+            9.0,
+            theme::fade(self.pal.well, alpha * (if active { 1.6 } else { 1.0 })),
+        );
+        self.stroke_rrect(
+            t,
+            input,
+            9.0,
+            1.0,
+            theme::fade(
+                if active {
+                    cfg.notch.accent
+                } else {
+                    self.pal.rule
+                },
+                alpha * (if active { 0.9 } else { 1.0 }),
+            ),
+        );
+        let text = if state.is_agent_chat() {
+            state.edit_buffer.as_str()
+        } else {
+            "Message the agent…"
+        };
+        let color = if state.is_agent_chat() {
+            self.pal.text_hi
+        } else {
+            self.pal.text_lo
+        };
+        let y = input.top + 9.0;
+        self.label(
+            t,
+            family,
+            text,
+            11.0,
+            DWRITE_FONT_WEIGHT_MEDIUM,
+            0.0,
+            input.right - input.left - 18.0,
+            input.left + 10.0,
+            y,
+            theme::fade(color, alpha),
+        );
+        if active && state.caret_on {
+            let Ok(format) = self.text.format(family, 11.0, DWRITE_FONT_WEIGHT_MEDIUM) else {
+                return;
+            };
+            if let Ok(layout) = self.text.layout(
+                &state.edit_buffer,
+                &format,
+                input.right - input.left - 18.0,
+                30.0,
+            ) {
+                let (w, _) = TextEngine::measure(&layout);
+                let x = input.left + 10.0 + w + 1.0;
+                self.line(
+                    t,
+                    x,
+                    input.top + 7.0,
+                    x,
+                    input.bottom - 7.0,
+                    1.5,
+                    theme::fade(cfg.notch.accent, alpha),
+                );
+            }
+        }
     }
 
     pub(super) fn paint_clipboard(

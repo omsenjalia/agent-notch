@@ -7,6 +7,7 @@ pub mod desktop;
 pub mod guard;
 pub mod host;
 pub mod message;
+pub mod ollama;
 pub mod providers;
 pub mod storage;
 pub mod vision;

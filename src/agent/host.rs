@@ -1,6 +1,6 @@
 //! Host: owns the engine and the worker thread; status + events for the UI.
 
-use std::sync::atomic::{AtomicU8, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use std::sync::mpsc;
 use std::sync::{Arc, OnceLock};
 use std::time::Duration;
@@ -11,6 +11,10 @@ use crate::agent::agent::{AgentEngine, AgentEvent, PendingApproval};
 use crate::agent::config::AgentConfig;
 use crate::agent::storage;
 
+/// How much of the conversation the UIs keep on screen. Old events are
+/// dropped so a long session cannot grow the log without bound.
+const TRANSCRIPT_LIMIT: usize = 120;
+
 /// What the Agent slide shows about the brain.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Status {
@@ -18,6 +22,16 @@ pub enum Status {
     Thinking,
     /// Waiting for the user to approve the tool with the given name.
     Approval(String),
+}
+
+/// Append to the transcript, keeping it bounded.
+fn push_events(events: &Arc<Mutex<Vec<AgentEvent>>>, mut new: Vec<AgentEvent>) {
+    let mut log = events.lock();
+    log.append(&mut new);
+    if log.len() > TRANSCRIPT_LIMIT {
+        let drop = log.len() - TRANSCRIPT_LIMIT;
+        log.drain(..drop);
+    }
 }
 
 /// The global agent host, installed by the notch at startup.
@@ -39,6 +53,7 @@ pub struct Host {
     events: Arc<Mutex<Vec<AgentEvent>>>,
     status: Arc<Mutex<Status>>,
     approval: Arc<AtomicU8>,
+    enabled: Arc<AtomicBool>,
     tx: mpsc::Sender<String>,
 }
 
@@ -48,6 +63,7 @@ impl Host {
         let events = Arc::new(Mutex::new(Vec::new()));
         let status = Arc::new(Mutex::new(Status::Idle));
         let approval = Arc::new(AtomicU8::new(0));
+        let enabled = Arc::new(AtomicBool::new(cfg.enabled));
         let (tx, rx) = mpsc::channel::<String>();
         {
             let engine = Arc::clone(&engine);
@@ -59,8 +75,8 @@ impl Host {
                 .spawn(move || {
                     while let Ok(text) = rx.recv() {
                         *status.lock() = Status::Thinking;
-                        let mut new = engine.lock().process(&text);
-                        events.lock().append(&mut new);
+                        let new = engine.lock().process(&text);
+                        push_events(&events, new);
                         while engine.lock().pending().is_some() {
                             if let Some(tool) = engine.lock().pending_tool() {
                                 *status.lock() = Status::Approval(tool);
@@ -73,8 +89,8 @@ impl Host {
                             match decision {
                                 Some(approved) => {
                                     *status.lock() = Status::Thinking;
-                                    let mut new = engine.lock().resolve_pending(approved);
-                                    events.lock().append(&mut new);
+                                    let new = engine.lock().resolve_pending(approved);
+                                    push_events(&events, new);
                                 }
                                 None => {
                                     std::thread::sleep(Duration::from_millis(20));
@@ -91,6 +107,7 @@ impl Host {
             events,
             status,
             approval,
+            enabled,
             tx,
         }
     }
@@ -100,13 +117,43 @@ impl Host {
         self.status.lock().clone()
     }
 
-    /// Events published since the last drain.
-    pub fn drain_events(&self) -> Vec<AgentEvent> {
-        std::mem::take(&mut *self.events.lock())
+    /// The whole conversation so far. Both the Settings page and the notch
+    /// read this: draining would race, so whichever UI drew first would steal
+    /// the reply from the other.
+    pub fn transcript(&self) -> Vec<AgentEvent> {
+        self.events.lock().clone()
     }
 
-    /// Send a message to the agent.
+    /// Backwards-compatible name for [`Host::transcript`].
+    pub fn drain_events(&self) -> Vec<AgentEvent> {
+        self.transcript()
+    }
+
+    /// Apply edited settings without restarting the app. The chat page calls
+    /// this as soon as a provider or the approval mode changes.
+    pub fn reconfigure(&self, cfg: &AgentConfig) {
+        self.enabled.store(cfg.enabled, Ordering::SeqCst);
+        let mut engine = self.engine.lock();
+        engine.reconfigure(cfg);
+    }
+
+    /// Whether the brain is switched on in Settings.
+    pub fn is_enabled(&self) -> bool {
+        self.enabled.load(Ordering::SeqCst)
+    }
+
+    /// Send a message to the agent. When it is switched off, say so in the
+    /// conversation instead of silently dropping the message.
     pub fn send(&self, text: String) {
+        if !self.is_enabled() {
+            push_events(
+                &self.events,
+                vec![AgentEvent::Error(
+                    "Agent is off. Turn on “Agent enabled” in Settings › Agent.".to_owned(),
+                )],
+            );
+            return;
+        }
         let _ = self.tx.send(text);
     }
 

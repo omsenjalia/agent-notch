@@ -63,7 +63,7 @@ use crate::notch::hook;
 use crate::notch::layout::{self, Hit, PillPart, PodCandidates, PodKind, Target};
 use crate::notch::menu::{glyph, Half, MenuCommand, MenuRow, MenuView};
 use crate::notch::paint::{clock_key, Motion, Painter, PodDraw, Scene, SegmentDraw};
-use crate::notch::state::{Badge, NotchState};
+use crate::notch::state::{Badge, EditTarget, NotchState};
 use crate::notch::surface::D2DSurface;
 use crate::notch::theme;
 
@@ -1129,6 +1129,11 @@ impl NotchWindow {
             "Open Settings",
             glyph::SETTINGS,
         ));
+        rows.push(MenuRow::item(
+            MenuCommand::AgentChat,
+            "Chat with the agent",
+            glyph::AGENT,
+        ));
         rows.push(MenuRow::Separator);
         rows.push(MenuRow::toggle(
             MenuCommand::TogglePin,
@@ -1215,6 +1220,22 @@ impl NotchWindow {
     pub fn apply_menu(&mut self, command: MenuCommand, cfg: &mut AppConfig) -> bool {
         use crate::notch::{clipboard, shelf};
         match command {
+            MenuCommand::AgentChat => {
+                if let Some(index) = cfg
+                    .notch
+                    .effective_slides()
+                    .iter()
+                    .position(|slide| *slide == SlideKind::Agent)
+                {
+                    self.state.active = index;
+                    self.state.carousel.set(index as f32);
+                    self.state.open_sticky();
+                    self.state.expand.set(1.0);
+                    self.state.dirty = true;
+                }
+                self.menu = None;
+                true
+            }
             MenuCommand::TogglePin => {
                 self.state.toggle_pinned();
                 false
@@ -1623,10 +1644,21 @@ impl NotchWindow {
                 self.state.cancel_edit();
                 self.set_editing_style(cfg, false);
             } else if commit {
-                if self.state.commit_edit(cfg) {
-                    config_dirty = true;
+                if self.state.edit_target == EditTarget::AgentChat {
+                    let text = self.state.edit_buffer.trim().to_owned();
+                    if !text.is_empty() {
+                        if let Some(host) = crate::agent::global() {
+                            host.send(text);
+                        }
+                    }
+                    self.state.cancel_edit();
+                    self.set_editing_style(cfg, false);
+                } else {
+                    if self.state.commit_edit(cfg) {
+                        config_dirty = true;
+                    }
+                    self.set_editing_style(cfg, false);
                 }
-                self.set_editing_style(cfg, false);
             } else {
                 if backspace {
                     self.state.backspace();
@@ -2135,6 +2167,21 @@ impl NotchWindow {
                     }
                 }
             }
+            SlideKind::Agent => {
+                out.push(Target::rect(
+                    Hit::AgentChat,
+                    layout_rect(geom::agent_input_rect(raw)),
+                    9.0,
+                ));
+                if crate::agent::global()
+                    .map(|h| h.pending_approval().is_some())
+                    .unwrap_or(false)
+                {
+                    let (approve, deny) = geom::agent_approval_buttons(raw);
+                    out.push(Target::rect(Hit::AgentApprove, layout_rect(approve), 9.0));
+                    out.push(Target::rect(Hit::AgentDeny, layout_rect(deny), 9.0));
+                }
+            }
             _ => {}
         }
         out
@@ -2266,6 +2313,20 @@ impl NotchWindow {
                     crate::notch::notify::global_store()
                         .write()
                         .dismiss_item(id);
+                }
+            }
+            Hit::AgentChat => {
+                self.state.begin_agent_chat();
+                self.set_editing_style(cfg, true);
+            }
+            Hit::AgentApprove => {
+                if let Some(host) = crate::agent::global() {
+                    host.set_approval(true);
+                }
+            }
+            Hit::AgentDeny => {
+                if let Some(host) = crate::agent::global() {
+                    host.set_approval(false);
                 }
             }
             Hit::NotifClear => crate::notch::notify::global_store().write().clear_all(),

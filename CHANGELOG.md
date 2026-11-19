@@ -2,6 +2,23 @@
 
 What's new in each version of agent-notch, written for the people who use it.
 
+## Unreleased
+
+### New
+- **Chat with the agent in the notch.** The Agent slide now has a message box:
+  click it, type, press Enter. Approvals show as Approve / Deny buttons right
+  there. The right-click menu has a "Chat with the agent" shortcut.
+- **Ollama models are discovered for you.** Settings › Agent fetches the model
+  list from `http://127.0.0.1:11434/v1/models` automatically. Pick a model and
+  it is loaded into Ollama at once and kept warm for 10 minutes, including on
+  every later chat call.
+
+### Improved
+- Settings › Agent is now a short guided setup. The conversation stays on
+  screen instead of flashing for one frame, and hosted providers and approval
+  policy moved under "Advanced".
+- The "Agent enabled" switch now actually turns the brain on and off.
+
 ## [0.6.1] - 2026-10-27
 
 ### New

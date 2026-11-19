@@ -29,6 +29,8 @@ pub const MAX_H: f32 = 440.0;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MenuCommand {
     Settings,
+    /// Open the notch directly on the Agent chat slide.
+    AgentChat,
     TogglePin,
     PauseHover,
     ResumeHover,
@@ -51,6 +53,7 @@ pub enum MenuCommand {
 /// Segoe Fluent Icons / Segoe MDL2 Assets code points (the two share them).
 pub mod glyph {
     pub const SETTINGS: &str = "\u{E713}";
+    pub const AGENT: &str = "\u{E8A7}";
     pub const PIN: &str = "\u{E718}";
     pub const UNPIN: &str = "\u{E77A}";
     pub const PAUSE: &str = "\u{E769}";

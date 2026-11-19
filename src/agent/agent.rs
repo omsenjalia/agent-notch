@@ -75,6 +75,15 @@ impl AgentEngine {
         }
     }
 
+    /// Rebuild the chain and policy after the user edits Settings. Existing
+    /// chat history is kept, but a pending approval is dropped: its tool came
+    /// from the old model.
+    pub fn reconfigure(&mut self, cfg: &AgentConfig) {
+        self.chain = ProviderChain::new(cfg.chain.clone());
+        self.approval_mode = cfg.approval_mode;
+        self.pending = None;
+    }
+
     pub fn history(&self) -> &[Message] {
         &self.history
     }

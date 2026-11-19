@@ -2317,7 +2317,7 @@ impl Painter {
             }
             SlideKind::Shelf => self.paint_shelf(t, cfg, body, alpha, generation),
             SlideKind::Clipboard => self.paint_clipboard(t, cfg, body, alpha),
-            SlideKind::Agent => self.paint_agent_panel(t, cfg, body, alpha),
+            SlideKind::Agent => self.paint_agent_panel(t, cfg, state, body, alpha),
             SlideKind::Notifications => self.paint_notifications(t, cfg, state, body, alpha),
             SlideKind::Usage => self.paint_usage(t, cfg, body, alpha),
             SlideKind::Stats => self.paint_stats(t, cfg, body, alpha),

@@ -18,6 +18,7 @@ use ureq::Error as UreqError;
 use crate::agent::config::AgentProviderConfig;
 use crate::agent::desktop;
 use crate::agent::message::{messages_to_openai, ChatRequest, ChatResponse, ToolCall};
+use crate::agent::ollama;
 
 /// How a provider failure should be treated by the chain.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -254,6 +255,14 @@ impl ChatProvider for HttpProvider {
         );
         body.insert("tools".into(), desktop::tool_schemas());
         body.insert("stream".into(), Value::Bool(false));
+        // Every Ollama call refreshes the warm window, so a model selected in
+        // Settings stays loaded while the brain is actually using it.
+        if ollama::is_ollama(self.config.kind, &self.config.base_url) {
+            body.insert(
+                "keep_alive".into(),
+                Value::String(ollama::KEEP_ALIVE.to_owned()),
+            );
+        }
         let body = Value::Object(body).to_string();
 
         let mut req = ureq::post(&url).set("Content-Type", "application/json");
