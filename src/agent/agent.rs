@@ -173,7 +173,7 @@ impl AgentEngine {
                             tool: tool.clone(),
                             id: id.clone(),
                             args: args.clone(),
-                            description,
+                            description: description.clone(),
                         });
                         events.push(AgentEvent::ApprovalRequired { tool, id, description });
                         return events;

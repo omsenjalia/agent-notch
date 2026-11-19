@@ -242,7 +242,7 @@ impl ChatProvider for HttpProvider {
             req = req.set("Authorization", &format!("Bearer {key}"));
         }
         let response = req.send_string(&body).map_err(AgentError::from_ureq)?;
-        let text = response.into_string().map_err(AgentError::from_ureq)?;
+        let text = response.into_string().map_err(|e| AgentError::failover(e.to_string()))?;
         let value: Value = serde_json::from_str(&text)
             .map_err(|e| AgentError::failover(format!("invalid JSON from {url}: {e}")))?;
         parse_chat_response(&value)

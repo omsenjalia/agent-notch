@@ -48,7 +48,7 @@ pub fn all_screens() -> Vec<Rect> {
     }
     let mut find = Find { out: Vec::new() };
     let lparam = LPARAM((&mut find as *mut Find) as isize);
-    let hdc = G::GetDC(HWND::default());
+    let hdc = unsafe { G::GetDC(HWND::default()) };
     let _ = unsafe { G::EnumDisplayMonitors(hdc, None, Some(cb), lparam) };
     let _ = unsafe { G::ReleaseDC(HWND::default(), hdc) };
     find.out

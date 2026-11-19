@@ -136,6 +136,7 @@ impl SettingsApp {
             .size(11.0)
             .color(theme::text_secondary()),
         );
+        let mut remove_at: Option<usize> = None;
         for (index, provider) in cx.cfg.agent.chain.iter_mut().enumerate() {
             ui.add_space(6.0);
             ui.horizontal_wrapped(|ui| {
@@ -177,10 +178,13 @@ impl SettingsApp {
                 ui.checkbox(&mut provider.decision_model, "Decision model");
                 ui.checkbox(&mut provider.vision, "Vision");
                 if ui.button("Remove").clicked() {
-                    cx.cfg.agent.chain.remove(index);
-                    *cx.changed = true;
+                    remove_at = Some(index);
                 }
             });
+        }
+        if let Some(index) = remove_at {
+            cx.cfg.agent.chain.remove(index);
+            *cx.changed = true;
         }
         if ui.button("Add provider").clicked() {
             let next = cx.cfg.agent.chain.len() + 1;
