@@ -1090,7 +1090,7 @@ mod tests {
         }
         assert_eq!(state.edit_buffer, "what app has focus?");
         state.backspace();
-        assert_eq!(state.edit_buffer, "what app has focu");
+        assert_eq!(state.edit_buffer, "what app has focus");
         state.cancel_edit();
         assert!(!state.is_agent_chat());
         assert!(state.edit_buffer.is_empty());

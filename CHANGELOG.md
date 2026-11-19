@@ -2,6 +2,12 @@
 
 What's new in each version of agent-notch, written for the people who use it.
 
+## [0.6.5] - 2026-11-19
+
+### Fixed
+- Corrected a unit-test expectation for the new notch chat input; the full
+  test suite is green again.
+
 ## [0.6.4] - 2026-11-19
 
 ### New
