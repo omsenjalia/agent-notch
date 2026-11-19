@@ -4,7 +4,7 @@
 use eframe::egui::{self, RichText};
 use parking_lot::Mutex;
 
-use super::{PageCtx, SettingsApp, theme};
+use super::{theme, PageCtx, SettingsApp};
 use crate::agent::config::{AgentProviderConfig, ApprovalMode, ProviderKind};
 use crate::agent::{self, AgentEvent, Status};
 
@@ -79,7 +79,9 @@ impl SettingsApp {
                 AgentEvent::Answer(text) => {
                     ui.label(RichText::new(&text).color(theme::text_secondary()));
                 }
-                AgentEvent::ToolCall { tool, description, .. } => {
+                AgentEvent::ToolCall {
+                    tool, description, ..
+                } => {
                     ui.label(
                         RichText::new(format!("→ {description} ({tool})"))
                             .size(11.0)
@@ -91,10 +93,18 @@ impl SettingsApp {
                     if !ok {
                         line.insert_str(0, "failed: ");
                     }
-                    ui.label(RichText::new(line).size(11.0).color(theme::text_secondary()));
+                    ui.label(
+                        RichText::new(line)
+                            .size(11.0)
+                            .color(theme::text_secondary()),
+                    );
                 }
                 AgentEvent::ToolSkipped { tool } => {
-                    ui.label(RichText::new(format!("✕ {tool} — denied")).size(11.0).color(theme::text_secondary()));
+                    ui.label(
+                        RichText::new(format!("✕ {tool} — denied"))
+                            .size(11.0)
+                            .color(theme::text_secondary()),
+                    );
                 }
                 AgentEvent::ApprovalRequired { .. } => {
                     // Shown by the approval panel above.
@@ -113,8 +123,8 @@ impl SettingsApp {
         ui.add_space(8.0);
         ui.horizontal(|ui| {
             let mut input = AGENT_INPUT.lock().clone();
-            let response = ui
-                .add(egui::TextEdit::singleline(&mut input).hint_text("Message the agent…"));
+            let response =
+                ui.add(egui::TextEdit::singleline(&mut input).hint_text("Message the agent…"));
             let entered = ui.input(|i| i.key_pressed(egui::Key::Enter));
             let send = ui.button("Send");
             let can_send = !input.trim().is_empty();
@@ -145,10 +155,20 @@ impl SettingsApp {
                 egui::ComboBox::from_id_source(index)
                     .selected_text(provider.kind.label())
                     .show_ui(ui, |ui| {
-                        for kind in [ProviderKind::Local, ProviderKind::OpenRouter, ProviderKind::Groq, ProviderKind::OpenAICompatible] {
-                            if ui.selectable_label(kind == provider.kind, kind.label()).clicked() {
+                        for kind in [
+                            ProviderKind::Local,
+                            ProviderKind::OpenRouter,
+                            ProviderKind::Groq,
+                            ProviderKind::OpenAICompatible,
+                        ] {
+                            if ui
+                                .selectable_label(kind == provider.kind, kind.label())
+                                .clicked()
+                            {
                                 provider.kind = kind;
-                                if kind != ProviderKind::OpenAICompatible && provider.base_url.is_empty() {
+                                if kind != ProviderKind::OpenAICompatible
+                                    && provider.base_url.is_empty()
+                                {
                                     provider.base_url = kind.default_base_url();
                                 }
                                 if kind == ProviderKind::OpenAICompatible {
@@ -169,7 +189,11 @@ impl SettingsApp {
                         .desired_width(90.0)
                         .hint_text("Key env var"),
                 );
-                provider.api_key_env = if key_env.is_empty() { None } else { Some(key_env) };
+                provider.api_key_env = if key_env.is_empty() {
+                    None
+                } else {
+                    Some(key_env)
+                };
                 ui.add(
                     egui::TextEdit::singleline(&mut provider.model)
                         .desired_width(90.0)
@@ -208,7 +232,10 @@ impl SettingsApp {
                     .color(theme::text_secondary()),
             );
             for mode in [ApprovalMode::Ask, ApprovalMode::Autonomous] {
-                if ui.selectable_value(&mut cx.cfg.agent.approval_mode, mode, mode.label()).clicked() {
+                if ui
+                    .selectable_value(&mut cx.cfg.agent.approval_mode, mode, mode.label())
+                    .clicked()
+                {
                     *cx.changed = true;
                 }
             }

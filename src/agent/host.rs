@@ -86,7 +86,13 @@ impl Host {
                 })
                 .ok();
         }
-        Self { engine, events, status, approval, tx }
+        Self {
+            engine,
+            events,
+            status,
+            approval,
+            tx,
+        }
     }
 
     /// Current status for the Agent slide.
@@ -106,7 +112,8 @@ impl Host {
 
     /// Resolve the pending approval: `true` = approve, `false` = deny.
     pub fn set_approval(&self, approved: bool) {
-        self.approval.store(if approved { 1 } else { 2 }, Ordering::SeqCst);
+        self.approval
+            .store(if approved { 1 } else { 2 }, Ordering::SeqCst);
     }
 
     /// The tool awaiting approval, if any.

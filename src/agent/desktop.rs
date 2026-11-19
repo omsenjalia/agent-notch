@@ -197,7 +197,10 @@ unsafe extern "system" fn window_cb(hwnd: HWND, lparam: LPARAM) -> BOOL {
 /// Bring a window to the front: raise it and restore it.
 pub fn activate_window(title_substr: &str) -> bool {
     let needle = title_substr.to_lowercase();
-    let mut find = WindowFind { needle, found: None };
+    let mut find = WindowFind {
+        needle,
+        found: None,
+    };
     let lparam = LPARAM((&mut find as *mut WindowFind) as isize);
     let _ = unsafe { WM::EnumWindows(Some(window_cb), lparam) };
     match find.found {
@@ -286,7 +289,14 @@ fn execute_command(command: &str) -> (bool, String) {
         Ok(output) => {
             let out = String::from_utf8_lossy(&output.stdout).trim().to_owned();
             if output.status.success() {
-                (true, if out.is_empty() { "command completed".to_owned() } else { out })
+                (
+                    true,
+                    if out.is_empty() {
+                        "command completed".to_owned()
+                    } else {
+                        out
+                    },
+                )
             } else {
                 (false, out)
             }
@@ -321,7 +331,14 @@ pub fn run_tool(tool: &str, args: &Value) -> (bool, String) {
         }
         "clipboard_read" => {
             let text = clipboard_read();
-            (true, if text.is_empty() { "clipboard is empty".to_owned() } else { format!("{} chars", text.chars().count()) })
+            (
+                true,
+                if text.is_empty() {
+                    "clipboard is empty".to_owned()
+                } else {
+                    format!("{} chars", text.chars().count())
+                },
+            )
         }
         "clipboard_write" => {
             let text = args.get("text").and_then(Value::as_str).unwrap_or_default();
@@ -330,14 +347,20 @@ pub fn run_tool(tool: &str, args: &Value) -> (bool, String) {
         "scroll" => {
             let x = arg_i32(args, "x");
             let y = arg_i32(args, "y");
-            let direction = args.get("direction").and_then(Value::as_str).unwrap_or("down");
+            let direction = args
+                .get("direction")
+                .and_then(Value::as_str)
+                .unwrap_or("down");
             let amount = args.get("amount").and_then(Value::as_u64).unwrap_or(3) as u32;
             scroll(x, y, direction == "up", amount);
             (true, format!("scrolled {direction}"))
         }
         "click" => {
             click(arg_i32(args, "x"), arg_i32(args, "y"));
-            (true, format!("clicked ({}, {})", arg_i32(args, "x"), arg_i32(args, "y")))
+            (
+                true,
+                format!("clicked ({}, {})", arg_i32(args, "x"), arg_i32(args, "y")),
+            )
         }
         "right_click" => {
             right_click(arg_i32(args, "x"), arg_i32(args, "y"));
@@ -359,12 +382,18 @@ pub fn run_tool(tool: &str, args: &Value) -> (bool, String) {
             (true, format!("typed {} chars", text.chars().count()))
         }
         "press_chord" => {
-            let chord = args.get("chord").and_then(Value::as_str).unwrap_or_default();
+            let chord = args
+                .get("chord")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
             press_chord(chord);
             (true, format!("pressed {chord}"))
         }
         "activate_window" => {
-            let title = args.get("title").and_then(Value::as_str).unwrap_or_default();
+            let title = args
+                .get("title")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
             (activate_window(title), format!("activated {title:?}"))
         }
         "launch" => {
@@ -372,7 +401,10 @@ pub fn run_tool(tool: &str, args: &Value) -> (bool, String) {
             (launch(path), format!("launched {path}"))
         }
         "execute_command" => {
-            let command = args.get("command").and_then(Value::as_str).unwrap_or_default();
+            let command = args
+                .get("command")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
             execute_command(command)
         }
         other => (false, format!("unknown tool: {other}")),

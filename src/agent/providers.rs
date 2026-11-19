@@ -17,7 +17,7 @@ use ureq::Error as UreqError;
 
 use crate::agent::config::AgentProviderConfig;
 use crate::agent::desktop;
-use crate::agent::message::{ChatRequest, ChatResponse, messages_to_openai, ToolCall};
+use crate::agent::message::{messages_to_openai, ChatRequest, ChatResponse, ToolCall};
 
 /// How a provider failure should be treated by the chain.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -37,11 +37,17 @@ pub struct AgentError {
 
 impl AgentError {
     pub fn failover(message: String) -> Self {
-        Self { kind: FailureKind::Failover, message }
+        Self {
+            kind: FailureKind::Failover,
+            message,
+        }
     }
 
     pub fn fatal(message: String) -> Self {
-        Self { kind: FailureKind::Fatal, message }
+        Self {
+            kind: FailureKind::Fatal,
+            message,
+        }
     }
 
     fn from_ureq(error: UreqError) -> Self {
@@ -51,7 +57,10 @@ impl AgentError {
                     401 | 403 => FailureKind::Fatal,
                     _ => FailureKind::Failover,
                 };
-                AgentError { kind, message: format!("HTTP {code}: {error}") }
+                AgentError {
+                    kind,
+                    message: format!("HTTP {code}: {error}"),
+                }
             }
             UreqError::Transport(_) => AgentError::failover(error.to_string()),
         }
@@ -90,7 +99,12 @@ pub struct Health {
 
 impl Health {
     pub fn new() -> Self {
-        Self { healthy: true, down_until: None, last_error: None, errors: 0 }
+        Self {
+            healthy: true,
+            down_until: None,
+            last_error: None,
+            errors: 0,
+        }
     }
 
     pub fn note_ok(&mut self) {
@@ -157,7 +171,9 @@ impl ProviderChain {
 
     /// Whether any entry in the chain is usable right now.
     pub fn available(&self) -> bool {
-        self.entries.iter().any(|entry| entry.health.lock().available())
+        self.entries
+            .iter()
+            .any(|entry| entry.health.lock().available())
     }
 
     /// Whether any entry accepts screenshots as vision input.
@@ -171,7 +187,11 @@ impl ProviderChain {
         self.entries
             .iter()
             .position(|entry| entry.config.decision_model && entry.health.lock().available())
-            .or_else(|| self.entries.iter().position(|entry| entry.health.lock().available()))
+            .or_else(|| {
+                self.entries
+                    .iter()
+                    .position(|entry| entry.health.lock().available())
+            })
     }
 
     pub fn config(&self, index: usize) -> &AgentProviderConfig {
@@ -202,10 +222,8 @@ impl ProviderChain {
                 }
             }
         }
-        Err(last
-            .unwrap_or_else(|| AgentError::failover("no healthy providers".to_owned())))
+        Err(last.unwrap_or_else(|| AgentError::failover("no healthy providers".to_owned())))
     }
-
 }
 
 /// An OpenAI-compatible HTTP provider: `<base_url>/chat/completions`.
@@ -215,7 +233,9 @@ pub struct HttpProvider {
 
 impl HttpProvider {
     pub fn new(config: &AgentProviderConfig) -> Self {
-        Self { config: config.clone() }
+        Self {
+            config: config.clone(),
+        }
     }
 }
 
@@ -241,7 +261,9 @@ impl ChatProvider for HttpProvider {
             req = req.set("Authorization", &format!("Bearer {key}"));
         }
         let response = req.send_string(&body).map_err(AgentError::from_ureq)?;
-        let text = response.into_string().map_err(|e| AgentError::failover(e.to_string()))?;
+        let text = response
+            .into_string()
+            .map_err(|e| AgentError::failover(e.to_string()))?;
         let value: Value = serde_json::from_str(&text)
             .map_err(|e| AgentError::failover(format!("invalid JSON from {url}: {e}")))?;
         parse_chat_response(&value)
@@ -272,7 +294,11 @@ fn parse_chat_response(value: &Value) -> Result<ChatResponse, AgentError> {
                     let function = c.get("function")?;
                     Some(ToolCall {
                         id: c.get("id").and_then(Value::as_str).unwrap_or("").to_owned(),
-                        name: function.get("name").and_then(Value::as_str).unwrap_or("").to_owned(),
+                        name: function
+                            .get("name")
+                            .and_then(Value::as_str)
+                            .unwrap_or("")
+                            .to_owned(),
                         arguments: function
                             .get("arguments")
                             .and_then(Value::as_str)
@@ -283,7 +309,10 @@ fn parse_chat_response(value: &Value) -> Result<ChatResponse, AgentError> {
                 .collect()
         })
         .unwrap_or_default();
-    Ok(ChatResponse { content, tool_calls })
+    Ok(ChatResponse {
+        content,
+        tool_calls,
+    })
 }
 
 #[cfg(test)]
@@ -312,7 +341,10 @@ mod tests {
     #[test]
     fn failover_error_marks_unavailable_and_next_chain_member_stays_available() {
         let chain = chain_of(&[ProviderKind::Local, ProviderKind::Groq]);
-        chain.entries[0].health.lock().note_err(&AgentError::failover("HTTP 429".into()));
+        chain.entries[0]
+            .health
+            .lock()
+            .note_err(&AgentError::failover("HTTP 429".into()));
         assert!(!chain.entries[0].health.lock().available());
         assert!(chain.entries[1].health.lock().available());
         assert_eq!(chain.decision_index(), Some(1));
@@ -321,7 +353,10 @@ mod tests {
     #[test]
     fn fatal_error_marks_provider_down() {
         let chain = chain_of(&[ProviderKind::Local]);
-        chain.entries[0].health.lock().note_err(&AgentError::fatal("HTTP 401".into()));
+        chain.entries[0]
+            .health
+            .lock()
+            .note_err(&AgentError::fatal("HTTP 401".into()));
         assert!(!chain.entries[0].health.lock().available());
         assert!(!chain.available());
         assert_eq!(chain.decision_index(), None);

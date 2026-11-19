@@ -109,7 +109,9 @@ fn on_winrt_thread<T: Send + 'static>(
 fn store_task() -> Result<StartupTask, String> {
     StartupTask::GetAsync(&HSTRING::from(STORE_TASK_ID))
         .and_then(|op| op.get())
-        .map_err(|e| format!("Windows has no startup task \"{STORE_TASK_ID}\" for agent-notch: {e}"))
+        .map_err(|e| {
+            format!("Windows has no startup task \"{STORE_TASK_ID}\" for agent-notch: {e}")
+        })
 }
 
 /// The Store build's startup state as Windows sees it.
@@ -347,7 +349,10 @@ mod tests {
     #[test]
     fn command_is_quoted_and_quiet() {
         let cmd = command_for(Path::new(r"C:\Program Files\agent-notch\agent-notch.exe"));
-        assert_eq!(cmd, r#""C:\Program Files\agent-notch\agent-notch.exe" --startup"#);
+        assert_eq!(
+            cmd,
+            r#""C:\Program Files\agent-notch\agent-notch.exe" --startup"#
+        );
     }
 
     #[test]

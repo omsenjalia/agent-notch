@@ -149,7 +149,13 @@ mod tests {
 
     #[test]
     fn hosted_providers_default_base_urls() {
-        assert_eq!(ProviderKind::OpenRouter.default_base_url(), "https://openrouter.ai/api/v1");
-        assert_eq!(ProviderKind::Groq.default_base_url(), "https://api.groq.com/openai/v1");
+        assert_eq!(
+            ProviderKind::OpenRouter.default_base_url(),
+            "https://openrouter.ai/api/v1"
+        );
+        assert_eq!(
+            ProviderKind::Groq.default_base_url(),
+            "https://api.groq.com/openai/v1"
+        );
     }
 }

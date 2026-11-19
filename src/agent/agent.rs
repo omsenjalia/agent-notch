@@ -20,13 +20,27 @@ const MAX_ROUNDS: u32 = 8;
 pub enum AgentEvent {
     UserMessage(String),
     /// The agent asked to run a tool.
-    ToolCall { tool: String, description: String, id: String },
+    ToolCall {
+        tool: String,
+        description: String,
+        id: String,
+    },
     /// The tool ran.
-    ToolResult { tool: String, ok: bool, output: String },
+    ToolResult {
+        tool: String,
+        ok: bool,
+        output: String,
+    },
     /// The user denied the pending tool.
-    ToolSkipped { tool: String },
+    ToolSkipped {
+        tool: String,
+    },
     /// The agent needs approval before running `tool`.
-    ApprovalRequired { tool: String, id: String, description: String },
+    ApprovalRequired {
+        tool: String,
+        id: String,
+        description: String,
+    },
     /// The agent's final answer for the user.
     Answer(String),
     /// A provider or tool call failed.
@@ -79,7 +93,8 @@ impl AgentEngine {
         let mut events = vec![AgentEvent::UserMessage(text.to_owned())];
         self.ctx = Some(ScreenContext::gather(&self.chain));
         let ctx = self.ctx.clone();
-        self.history.push(Message::system(self.system_prompt(ctx.as_ref())));
+        self.history
+            .push(Message::system(self.system_prompt(ctx.as_ref())));
         let images = ctx.as_ref().map(|c| c.screens.clone()).unwrap_or_default();
         self.history.push(Message::user(text.to_owned(), images));
         events.extend(self.run_rounds());
@@ -100,11 +115,16 @@ impl AgentEngine {
                 ok,
                 output: output.clone(),
             });
-            self.history.push(Message::tool_result(p.id.clone(), output));
-        } else {
-            events.push(AgentEvent::ToolSkipped { tool: p.tool.clone() });
             self.history
-                .push(Message::tool_result(p.id.clone(), "cancelled by the user".to_owned()));
+                .push(Message::tool_result(p.id.clone(), output));
+        } else {
+            events.push(AgentEvent::ToolSkipped {
+                tool: p.tool.clone(),
+            });
+            self.history.push(Message::tool_result(
+                p.id.clone(),
+                "cancelled by the user".to_owned(),
+            ));
         }
         events.extend(self.run_rounds());
         storage::save_history(&self.history);
@@ -121,7 +141,10 @@ impl AgentEngine {
                 return events;
             };
             let model = self.chain.config(idx).model.clone();
-            let request = ChatRequest { model, messages: self.history.clone() };
+            let request = ChatRequest {
+                model,
+                messages: self.history.clone(),
+            };
             let response = match self.chain.chat(&request) {
                 Ok(response) => response,
                 Err(error) => {
@@ -156,8 +179,7 @@ impl AgentEngine {
                     let call = ToolCall {
                         id: id.clone(),
                         name: tool.clone(),
-                        arguments: serde_json::to_string(&args)
-                            .unwrap_or_else(|_| "{}".to_owned()),
+                        arguments: serde_json::to_string(&args).unwrap_or_else(|_| "{}".to_owned()),
                     };
                     self.history.push(Message::assistant(vec![call]));
                     if guard::auto_run(self.approval_mode, &tool) {
@@ -175,7 +197,11 @@ impl AgentEngine {
                             args: args.clone(),
                             description: description.clone(),
                         });
-                        events.push(AgentEvent::ApprovalRequired { tool, id, description });
+                        events.push(AgentEvent::ApprovalRequired {
+                            tool,
+                            id,
+                            description,
+                        });
                         return events;
                     }
                 }
@@ -305,13 +331,19 @@ mod tests {
         let mut engine = AgentEngine::new(&config, Vec::new());
 
         let events = engine.process("click around");
-        assert!(events.iter().any(|e| matches!(e, AgentEvent::ApprovalRequired { tool, .. } if tool == "click")));
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::ApprovalRequired { tool, .. } if tool == "click")));
         assert!(engine.pending_tool().as_deref() == Some("click"));
 
         // Denying skips the tool, then the second mock response is the answer.
         let events = engine.resolve_pending(false);
-        assert!(events.iter().any(|e| matches!(e, AgentEvent::ToolSkipped { tool } if tool == "click")));
-        assert!(events.iter().any(|e| matches!(e, AgentEvent::Answer(t) if t.contains("clicked"))));
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::ToolSkipped { tool } if tool == "click")));
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::Answer(t) if t.contains("clicked"))));
         server.join().unwrap();
     }
 
@@ -329,8 +361,12 @@ mod tests {
         let config = mock_config(addr);
         let mut engine = AgentEngine::new(&config, Vec::new());
         let events = engine.process("hello");
-        assert!(events.iter().any(|e| matches!(e, AgentEvent::Answer(t) if t == "clicked (100, 200)")));
-        assert!(!events.iter().any(|e| matches!(e, AgentEvent::ApprovalRequired { .. })));
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::Answer(t) if t == "clicked (100, 200)")));
+        assert!(!events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::ApprovalRequired { .. })));
         server.join().unwrap();
     }
 }

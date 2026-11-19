@@ -31,7 +31,12 @@ pub fn all_screens() -> Vec<Rect> {
     struct Find {
         out: Vec<Rect>,
     }
-    unsafe extern "system" fn cb(hmonitor: G::HMONITOR, _hdc: G::HDC, _lprc: *mut RECT, lparam: LPARAM) -> BOOL {
+    unsafe extern "system" fn cb(
+        hmonitor: G::HMONITOR,
+        _hdc: G::HDC,
+        _lprc: *mut RECT,
+        lparam: LPARAM,
+    ) -> BOOL {
         let find: &mut Find = &mut *(lparam.0 as *mut Find);
         let mut mi = G::MONITORINFO {
             cbSize: std::mem::size_of::<G::MONITORINFO>() as u32,
@@ -82,7 +87,12 @@ pub fn capture_screenshot(monitor_index: usize) -> Option<image::RgbImage> {
                 biClrUsed: 0,
                 biClrImportant: 0,
             },
-            bmiColors: [G::RGBQUAD { rgbBlue: 0, rgbGreen: 0, rgbRed: 0, rgbReserved: 0 }; 1],
+            bmiColors: [G::RGBQUAD {
+                rgbBlue: 0,
+                rgbGreen: 0,
+                rgbRed: 0,
+                rgbReserved: 0,
+            }; 1],
         };
         let mut buf = vec![0u8; (w * h * 3) as usize];
         let _ = G::GetDIBits(
@@ -103,7 +113,11 @@ pub fn capture_screenshot(monitor_index: usize) -> Option<image::RgbImage> {
         for y in 0..h {
             for x in 0..w {
                 let i = ((y * w + x) * 3) as usize;
-                image.put_pixel(x as u32, y as u32, image::Rgb([buf[i], buf[i + 1], buf[i + 2]]));
+                image.put_pixel(
+                    x as u32,
+                    y as u32,
+                    image::Rgb([buf[i], buf[i + 1], buf[i + 2]]),
+                );
             }
         }
         Some(image)
@@ -126,7 +140,9 @@ pub fn foreground_info() -> (String, String) {
 /// Encode a screenshot as a PNG data URI, for vision models.
 pub fn encode_png_data_uri(image: &image::RgbImage) -> Option<String> {
     let mut buf = Vec::new();
-    image.write_to(&mut std::io::Cursor::new(&mut buf), image::ImageFormat::Png).ok()?;
+    image
+        .write_to(&mut std::io::Cursor::new(&mut buf), image::ImageFormat::Png)
+        .ok()?;
     Some(format!("data:image/png;base64,{}", base64::encode(&buf)))
 }
 
@@ -169,7 +185,10 @@ impl ScreenContext {
         let window = if self.foreground_title.is_empty() && self.foreground_app.is_empty() {
             "No foreground window visible".to_owned()
         } else {
-            format!("Foreground window: \"{}\" ({})", self.foreground_title, self.foreground_app)
+            format!(
+                "Foreground window: \"{}\" ({})",
+                self.foreground_title, self.foreground_app
+            )
         };
         let clipboard = if self.clipboard.is_empty() {
             "clipboard: empty".to_owned()
@@ -204,8 +223,26 @@ mod tests {
 
     #[test]
     fn rect_dimensions() {
-        assert_eq!(Rect { left: 0, top: 0, right: 1920, bottom: 1080 }.width(), 1920);
-        assert_eq!(Rect { left: 0, top: 0, right: 1920, bottom: 1080 }.height(), 1080);
+        assert_eq!(
+            Rect {
+                left: 0,
+                top: 0,
+                right: 1920,
+                bottom: 1080
+            }
+            .width(),
+            1920
+        );
+        assert_eq!(
+            Rect {
+                left: 0,
+                top: 0,
+                right: 1920,
+                bottom: 1080
+            }
+            .height(),
+            1080
+        );
     }
 
     #[test]

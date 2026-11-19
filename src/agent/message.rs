@@ -231,7 +231,9 @@ mod tests {
     #[test]
     fn decision_parses_tool_json() {
         assert_eq!(
-            Decision::from_text("{\"type\":\"tool\",\"tool\":\"click\",\"args\":{\"x\":10,\"y\":20}}"),
+            Decision::from_text(
+                "{\"type\":\"tool\",\"tool\":\"click\",\"args\":{\"x\":10,\"y\":20}}"
+            ),
             Decision::Tool {
                 tool: "click".to_owned(),
                 args: serde_json::json!({"x": 10, "y": 20}),
@@ -241,7 +243,10 @@ mod tests {
 
     #[test]
     fn decision_falls_back_to_raw_text() {
-        assert_eq!(Decision::from_text("nothing here"), Decision::Answer("nothing here".to_owned()));
+        assert_eq!(
+            Decision::from_text("nothing here"),
+            Decision::Answer("nothing here".to_owned())
+        );
     }
 
     #[test]

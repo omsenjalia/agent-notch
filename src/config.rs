@@ -1947,7 +1947,8 @@ fn default_phrase_spacing() -> u32 {
 impl Default for AppConfig {
     fn default() -> Self {
         Self {
-            text: "⭐ REMINDER: Stay focused & stay hydrated! • agent-notch Dynamic Notch ⭐".to_string(),
+            text: "⭐ REMINDER: Stay focused & stay hydrated! • agent-notch Dynamic Notch ⭐"
+                .to_string(),
             overlay_enabled: true,
             phrase_spacing: 6,
             edges: EdgeSelection::default(),

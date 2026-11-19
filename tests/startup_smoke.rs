@@ -119,7 +119,10 @@ impl ChildProcess {
             .expect("query child process")
             .is_some()
         {
-            panic!("agent-notch exited during {phase}.\n{}", self.diagnostics(phase));
+            panic!(
+                "agent-notch exited during {phase}.\n{}",
+                self.diagnostics(phase)
+            );
         }
     }
 

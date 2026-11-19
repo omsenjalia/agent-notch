@@ -40,7 +40,9 @@ unsafe extern "system" fn enum_windows_callback(
         let len = windows::Win32::UI::WindowsAndMessaging::GetWindowTextW(hwnd, &mut buffer);
         if len > 0 {
             let text = String::from_utf16_lossy(&buffer[..len as usize]);
-            if (text.contains("agent-notch") || text.contains("MovingText")) && !text.contains("Tray") {
+            if (text.contains("agent-notch") || text.contains("MovingText"))
+                && !text.contains("Tray")
+            {
                 let out_ptr = lparam.0 as *mut isize;
                 *out_ptr = hwnd.0 as isize;
                 return windows::Win32::Foundation::BOOL(0);
