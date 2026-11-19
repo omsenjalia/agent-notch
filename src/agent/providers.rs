@@ -18,7 +18,6 @@ use ureq::Error as UreqError;
 use crate::agent::config::AgentProviderConfig;
 use crate::agent::desktop;
 use crate::agent::message::{messages_to_openai, ChatRequest, ChatResponse, ToolCall};
-use crate::agent::ollama;
 
 /// How a provider failure should be treated by the chain.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -52,18 +51,29 @@ impl AgentError {
     }
 
     fn from_ureq(error: UreqError) -> Self {
-        match &error {
-            UreqError::Status(code, _) => {
+        match error {
+            UreqError::Status(code, response) => {
                 let kind = match code {
                     401 | 403 => FailureKind::Fatal,
                     _ => FailureKind::Failover,
                 };
-                AgentError {
-                    kind,
-                    message: format!("HTTP {code}: {error}"),
-                }
+                // Surface the server's own explanation (Ollama compat often
+                // reports the real cause in the body of a 500). Keep it short.
+                let snippet: String = response
+                    .into_string()
+                    .unwrap_or_default()
+                    .chars()
+                    .take(240)
+                    .collect();
+                let snippet = snippet.trim();
+                let message = if snippet.is_empty() {
+                    format!("HTTP {code}")
+                } else {
+                    format!("HTTP {code}: {snippet}")
+                };
+                AgentError { kind, message }
             }
-            UreqError::Transport(_) => AgentError::failover(error.to_string()),
+            UreqError::Transport(e) => AgentError::failover(e.to_string()),
         }
     }
 }
@@ -240,30 +250,41 @@ impl HttpProvider {
     }
 }
 
+/// Build the OpenAI-compatible `<base_url>/chat/completions` endpoint.
+///
+/// Whitespace and any trailing slashes on `base_url` are removed first so the
+/// result never contains a doubled slash.
+pub fn chat_endpoint_url(base_url: &str) -> String {
+    format!("{}/chat/completions", base_url.trim().trim_end_matches('/'))
+}
+
+/// Build a strictly OpenAI-compatible chat-completions request body.
+///
+/// Only standard fields (`model`, `messages`, `tools`, `stream`) are emitted.
+/// In particular no Ollama-specific `keep_alive` is added — strict servers
+/// reject unknown fields, which surfaced as HTTP 500 from the Settings › Agent
+/// chat path. Model warming is a separate, native concern handled by
+/// `ollama::keep_loaded`.
+pub fn build_chat_request_body(
+    config: &AgentProviderConfig,
+    request: &ChatRequest,
+) -> Result<Value, AgentError> {
+    let mut body = serde_json::Map::new();
+    body.insert("model".into(), Value::String(config.model.clone()));
+    body.insert(
+        "messages".into(),
+        serde_json::to_value(messages_to_openai(&request.messages))
+            .map_err(|e| AgentError::failover(format!("serialize messages: {e}")))?,
+    );
+    body.insert("tools".into(), desktop::tool_schemas());
+    body.insert("stream".into(), Value::Bool(false));
+    Ok(Value::Object(body))
+}
+
 impl ChatProvider for HttpProvider {
     fn chat(&self, request: &ChatRequest) -> Result<ChatResponse, AgentError> {
-        let url = format!(
-            "{}/chat/completions",
-            self.config.base_url.trim_end_matches('/')
-        );
-        let mut body = serde_json::Map::new();
-        body.insert("model".into(), Value::String(self.config.model.clone()));
-        body.insert(
-            "messages".into(),
-            serde_json::to_value(messages_to_openai(&request.messages))
-                .map_err(|e| AgentError::failover(format!("serialize messages: {e}")))?,
-        );
-        body.insert("tools".into(), desktop::tool_schemas());
-        body.insert("stream".into(), Value::Bool(false));
-        // Every Ollama call refreshes the warm window, so a model selected in
-        // Settings stays loaded while the brain is actually using it.
-        if ollama::is_ollama(self.config.kind, &self.config.base_url) {
-            body.insert(
-                "keep_alive".into(),
-                Value::String(ollama::KEEP_ALIVE.to_owned()),
-            );
-        }
-        let body = Value::Object(body).to_string();
+        let url = chat_endpoint_url(&self.config.base_url);
+        let body = build_chat_request_body(&self.config, request)?.to_string();
 
         let mut req = ureq::post(&url).set("Content-Type", "application/json");
         if let Some(key) = self.config.api_key() {
@@ -328,6 +349,7 @@ fn parse_chat_response(value: &Value) -> Result<ChatResponse, AgentError> {
 mod tests {
     use super::*;
     use crate::agent::config::{AgentProviderConfig, ProviderKind};
+    use crate::agent::message::Message;
 
     fn chain_of(kinds: &[ProviderKind]) -> ProviderChain {
         let configs = kinds
@@ -396,5 +418,52 @@ mod tests {
         chain.entries[0].config.decision_model = false;
         chain.entries[1].config.decision_model = true;
         assert_eq!(chain.decision_index(), Some(1));
+    }
+
+    #[test]
+    fn chat_body_has_no_keep_alive_for_local_or_hosted_providers() {
+        let request = ChatRequest {
+            model: "unused".to_owned(),
+            messages: vec![Message::user("hi".to_owned(), vec![])],
+        };
+
+        let mut local = AgentProviderConfig::new("ollama", ProviderKind::Local, "llama3.1");
+        local.base_url = "http://127.0.0.1:11434/v1".to_owned();
+        let local_body = build_chat_request_body(&local, &request).unwrap();
+        assert!(local_body.get("keep_alive").is_none());
+        assert!(local_body.get("model").is_some());
+        assert!(local_body.get("messages").is_some());
+        assert!(local_body.get("tools").is_some());
+        assert_eq!(
+            local_body.get("stream").and_then(Value::as_bool),
+            Some(false)
+        );
+
+        let hosted = AgentProviderConfig::new("or", ProviderKind::OpenRouter, "openai/gpt-4o");
+        let hosted_body = build_chat_request_body(&hosted, &request).unwrap();
+        assert!(hosted_body.get("keep_alive").is_none());
+        assert!(hosted_body.get("model").is_some());
+        assert!(hosted_body.get("messages").is_some());
+        assert!(hosted_body.get("tools").is_some());
+        assert_eq!(
+            hosted_body.get("stream").and_then(Value::as_bool),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn chat_endpoint_url_normalises_whitespace_and_slashes() {
+        assert_eq!(
+            chat_endpoint_url(" http://127.0.0.1:11434/v1/ "),
+            "http://127.0.0.1:11434/v1/chat/completions"
+        );
+        assert_eq!(
+            chat_endpoint_url("http://x/v1///"),
+            "http://x/v1/chat/completions"
+        );
+        assert_eq!(
+            chat_endpoint_url("http://x/v1"),
+            "http://x/v1/chat/completions"
+        );
     }
 }

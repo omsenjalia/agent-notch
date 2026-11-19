@@ -45,6 +45,13 @@ pub enum Badge {
 /// later.
 const EFFECT_FIRST_RUN: f32 = 0.6;
 
+/// How many ticks to ignore a lost-focus event after the window grabs focus
+/// for editing. `SetForegroundWindow`/`SetFocus` can itself make the window
+/// report `WM_KILLFOCUS`, and the click that begins an edit is handled after
+/// the input for that tick has already been drained — so the spurious event
+/// is seen on the following tick. Two countdown steps cover that one tick.
+const EDIT_FOCUS_GUARD_TICKS: u8 = 2;
+
 pub struct NotchState {
     /// 0 = collapsed pill, 1 = fully open panel.
     pub expand: Spring,
@@ -92,6 +99,10 @@ pub struct NotchState {
     pub editing: bool,
     pub edit_target: EditTarget,
     pub edit_buffer: String,
+    /// Countdown of ticks for which a focus-loss is ignored, so the
+    /// `WM_KILLFOCUS` caused by grabbing keyboard focus does not cancel the
+    /// edit the moment it starts.
+    pub edit_focus_guard: u8,
     /// The clickable thing under the cursor in the open panel.
     pub hot: Option<Target>,
     /// The last one hovered, kept while its highlight fades out.
@@ -175,6 +186,7 @@ impl NotchState {
             editing: false,
             edit_target: EditTarget::Focus,
             edit_buffer: String::new(),
+            edit_focus_guard: 0,
             wave: [0.22; layout::WAVE_BARS],
             hot: None,
             hot_shown: None,
@@ -521,6 +533,7 @@ impl NotchState {
     pub fn tick(&mut self, cfg: &AppConfig, target_expand: f32, dt: f32) {
         self.elapsed += dt;
         self.badge_time = (self.badge_time - dt).max(0.0);
+        self.edit_focus_guard = self.edit_focus_guard.saturating_sub(1);
         self.tick_border_effect(cfg, dt);
 
         self.expand.step(target_expand, dt);
@@ -615,6 +628,9 @@ impl NotchState {
     }
 
     pub fn begin_edit(&mut self, cfg: &AppConfig) {
+        // Re-clicking a field grabs focus again, so renew the guard even when
+        // that field is already being edited.
+        self.edit_focus_guard = EDIT_FOCUS_GUARD_TICKS;
         if self.editing {
             return;
         }
@@ -627,8 +643,15 @@ impl NotchState {
 
     /// Start typing a message to the agent.
     pub fn begin_agent_chat(&mut self) {
-        if self.editing {
+        self.edit_focus_guard = EDIT_FOCUS_GUARD_TICKS;
+        if self.editing && self.edit_target == EditTarget::AgentChat {
+            // Already here: keep what was typed, just guard the re-focus.
             return;
+        }
+        if self.editing {
+            // Clicking the chat box while editing another field switches to
+            // the chat rather than doing nothing.
+            self.cancel_edit();
         }
         self.editing = true;
         self.edit_target = EditTarget::AgentChat;
@@ -644,6 +667,7 @@ impl NotchState {
 
     /// Start typing a new item for the short list.
     pub fn begin_add(&mut self) {
+        self.edit_focus_guard = EDIT_FOCUS_GUARD_TICKS;
         if self.editing {
             return;
         }
@@ -1094,6 +1118,63 @@ mod tests {
         state.cancel_edit();
         assert!(!state.is_agent_chat());
         assert!(state.edit_buffer.is_empty());
+    }
+
+    #[test]
+    fn agent_chat_begin_cancels_other_edit() {
+        let cfg = AppConfig::default();
+        let mut state = NotchState::new(&cfg);
+
+        // Editing the focus line, then clicking the chat box, switches to the
+        // chat with a fresh buffer instead of being ignored.
+        state.begin_edit(&cfg);
+        for ch in "old focus".chars() {
+            state.type_char(ch);
+        }
+        assert_eq!(state.edit_target, EditTarget::Focus);
+
+        state.begin_agent_chat();
+        assert!(state.is_agent_chat());
+        assert!(state.edit_buffer.is_empty());
+
+        // And the reverse: an agent edit switched away from is dropped.
+        state.type_char('h');
+        state.type_char('i');
+        state.begin_edit(&cfg);
+        assert_eq!(state.edit_target, EditTarget::Focus);
+        assert_eq!(state.edit_buffer, cfg.status.focus);
+    }
+
+    #[test]
+    fn agent_chat_refocus_keeps_existing_buffer() {
+        let cfg = AppConfig::default();
+        let mut state = NotchState::new(&cfg);
+        state.begin_agent_chat();
+        for ch in "draft".chars() {
+            state.type_char(ch);
+        }
+        // Re-clicking the same field must not wipe what was typed.
+        state.begin_agent_chat();
+        assert_eq!(state.edit_buffer, "draft");
+    }
+
+    #[test]
+    fn edit_focus_guard_consumed_once() {
+        let cfg = AppConfig::default();
+        let mut state = NotchState::new(&cfg);
+        assert_eq!(state.edit_focus_guard, 0);
+
+        state.begin_agent_chat();
+        assert_eq!(state.edit_focus_guard, EDIT_FOCUS_GUARD_TICKS);
+
+        // Countdown falls by exactly one per tick, then stays at zero. The
+        // window skips a focus-loss cancellation while this is non-zero.
+        state.tick(&cfg, 0.0, 1.0 / 60.0);
+        assert_eq!(state.edit_focus_guard, EDIT_FOCUS_GUARD_TICKS - 1);
+        state.tick(&cfg, 0.0, 1.0 / 60.0);
+        assert_eq!(state.edit_focus_guard, 0);
+        state.tick(&cfg, 0.0, 1.0 / 60.0);
+        assert_eq!(state.edit_focus_guard, 0);
     }
 
     #[test]

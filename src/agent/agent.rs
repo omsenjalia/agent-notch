@@ -76,12 +76,20 @@ impl AgentEngine {
     }
 
     /// Rebuild the chain and policy after the user edits Settings. Existing
-    /// chat history is kept, but a pending approval is dropped: its tool came
-    /// from the old model.
-    pub fn reconfigure(&mut self, cfg: &AgentConfig) {
+    /// chat history is kept. A pending approval is dropped — its tool came
+    /// from the old model — but the transcript is told, so the conversation
+    /// does not end on a question with no answer.
+    pub fn reconfigure(&mut self, cfg: &AgentConfig) -> Vec<AgentEvent> {
+        let mut events = Vec::new();
+        if self.pending.take().is_some() {
+            events.push(AgentEvent::Error(
+                "Settings changed while a tool was awaiting approval; the action was cancelled."
+                    .to_owned(),
+            ));
+        }
         self.chain = ProviderChain::new(cfg.chain.clone());
         self.approval_mode = cfg.approval_mode;
-        self.pending = None;
+        events
     }
 
     pub fn history(&self) -> &[Message] {
@@ -265,6 +273,26 @@ mod tests {
 
     use super::*;
     use crate::agent::config::{AgentProviderConfig, ProviderKind};
+
+    #[test]
+    fn reconfigure_reports_a_dropped_pending_approval() {
+        let cfg = AgentConfig::default();
+        let mut engine = AgentEngine::new(&cfg, Vec::new());
+        engine.pending = Some(PendingApproval {
+            tool: "click".to_owned(),
+            id: "c1".to_owned(),
+            args: serde_json::json!({"x": 100}),
+            description: "click at (100, 100)".to_owned(),
+        });
+        let events = engine.reconfigure(&cfg);
+        assert!(engine.pending().is_none());
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, AgentEvent::Error(m) if m.contains("cancelled"))),
+            "the transcript must explain why the question vanished"
+        );
+    }
 
     const TOOL_RESPONSE: &str = r#"{"choices":[{"message":{"content":null,"tool_calls":[{"id":"c1","type":"function","function":{"name":"click","arguments":"{\"x\":100,\"y\":200}"}}]}}]}"#;
     const ANSWER_RESPONSE: &str = r#"{"choices":[{"message":{"content":"{\"type\":\"answer\",\"text\":\"clicked (100, 200)\"}"}}]}"#;

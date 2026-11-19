@@ -2,6 +2,22 @@
 
 What's new in each version of agent-notch, written for the people who use it.
 
+## [0.6.6] - 2026-11-19
+
+### Fixed
+- **Sending a message no longer returns HTTP 500 on Ollama.** Chat requests are
+  now strict OpenAI-compatible JSON; the Ollama-only `keep_alive` field is used
+  only when preloading a model, never in `/v1/chat/completions`. A 500 now
+  shows the server's own explanation instead of a bare status code.
+- **The notch's right-click menu works again.** "Chat with the agent" no longer
+  tears the menu down outside its close animation, Esc stays registered while
+  typing, and a focus race that cancelled the chat input immediately is fixed.
+- Settings changes are applied between turns instead of blocking the UI
+  thread. A stale Approve click can no longer authorise a later tool, and
+  switching the agent off cancels work already waiting for approval.
+- Model discovery refreshes when the base URL changes, and stale background
+  fetch/load results can no longer overwrite current ones.
+
 ## [0.6.5] - 2026-11-19
 
 ### Fixed

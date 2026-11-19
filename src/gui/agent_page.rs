@@ -23,8 +23,12 @@ struct OllamaUi {
     warming: Option<String>,
     /// Result of the last load, shown as one quiet line.
     warm_note: Option<String>,
-    fetch_rx: Option<Receiver<Result<Vec<String>, String>>>,
-    warm_rx: Option<Receiver<Result<String, String>>>,
+    /// Outbound job payloads carry their generation so stale results (from a
+    /// different Base URL or an older model selection) can be ignored.
+    fetch_rx: Option<Receiver<(u64, Result<Vec<String>, String>)>>,
+    warm_rx: Option<Receiver<(u64, String, Result<(), String>)>>,
+    fetch_gen: u64,
+    warm_gen: u64,
     /// Base URL the automatic fetch was last attempted for (prevents a loop
     /// when Ollama is offline).
     tried: String,
@@ -40,6 +44,8 @@ impl OllamaUi {
             warm_note: None,
             fetch_rx: None,
             warm_rx: None,
+            fetch_gen: 0,
+            warm_gen: 0,
             tried: String::new(),
         }
     }
@@ -49,13 +55,16 @@ static OLLAMA: Mutex<OllamaUi> = Mutex::new(OllamaUi::new());
 
 fn refresh_models(base_url: &str) {
     let (tx, rx) = mpsc::channel();
-    {
+    let gen = {
         let mut state = OLLAMA.lock();
+        state.fetch_gen = state.fetch_gen.wrapping_add(1);
         state.loading = true;
         state.error = None;
+        // Mark the attempt before spawning so offline frames never retry-storm.
         state.tried = base_url.to_owned();
         state.fetch_rx = Some(rx);
-    }
+        state.fetch_gen
+    };
     let base = base_url.to_owned();
     let _ = std::thread::Builder::new()
         .name("agent-notch ollama models".to_owned())
@@ -71,26 +80,26 @@ fn refresh_models(base_url: &str) {
                         Ok(models)
                     }
                 });
-            let _ = tx.send(result);
+            let _ = tx.send((gen, result));
         });
 }
 
 fn warm_model(base_url: &str, model: &str) {
     let (tx, rx) = mpsc::channel();
-    {
+    let gen = {
         let mut state = OLLAMA.lock();
+        state.warm_gen = state.warm_gen.wrapping_add(1);
         state.warming = Some(model.to_owned());
         state.warm_note = None;
         state.warm_rx = Some(rx);
-    }
+        state.warm_gen
+    };
     let (base, model) = (base_url.to_owned(), model.to_owned());
     let _ = std::thread::Builder::new()
         .name("agent-notch ollama load".to_owned())
         .spawn(move || {
-            let result = ollama::keep_loaded(&base, &model)
-                .map(|_| model.clone())
-                .map_err(|e| e.message);
-            let _ = tx.send(result);
+            let result = ollama::keep_loaded(&base, &model).map_err(|e| e.message);
+            let _ = tx.send((gen, model, result));
         });
 }
 
@@ -98,26 +107,34 @@ fn warm_model(base_url: &str, model: &str) {
 fn poll_ollama() {
     let mut state = OLLAMA.lock();
     if let Some(rx) = &state.fetch_rx {
-        if let Ok(result) = rx.try_recv() {
-            match result {
-                Ok(models) => state.models = models,
-                Err(error) => {
-                    state.models.clear();
-                    state.error = Some(error);
+        if let Ok((gen, result)) = rx.try_recv() {
+            // Only the newest job may publish; older URLs are stale.
+            if gen == state.fetch_gen {
+                match result {
+                    Ok(models) => state.models = models,
+                    Err(error) => {
+                        state.models.clear();
+                        state.error = Some(error);
+                    }
                 }
+                state.loading = false;
             }
-            state.loading = false;
             state.fetch_rx = None;
         }
     }
     if let Some(rx) = &state.warm_rx {
-        if let Ok(result) = rx.try_recv() {
-            state.warming = None;
+        if let Ok((gen, model, result)) = rx.try_recv() {
+            if gen == state.warm_gen {
+                state.warming = None;
+                state.warm_note = Some(match result {
+                    Ok(()) => format!("{model} is loaded and kept warm for 10 minutes."),
+                    Err(error) => format!(
+                        "Could not warm {model}: {error}. Is Ollama running with that \
+                         model pulled?"
+                    ),
+                });
+            }
             state.warm_rx = None;
-            state.warm_note = Some(match result {
-                Ok(model) => format!("{model} is loaded and kept warm for 10 minutes."),
-                Err(error) => format!("Could not warm the model: {error}"),
-            });
         }
     }
 }
@@ -272,8 +289,25 @@ impl SettingsApp {
                     .add(egui::TextEdit::singleline(&mut url).desired_width(240.0))
                     .changed()
                 {
-                    provider.base_url = url;
+                    // Normalise before persisting: trim whitespace/slashes and
+                    // turn a bare Ollama root into the /v1 endpoint.
+                    provider.base_url = ollama::normalize_base_url(&url);
                     edited = true;
+                    // A new server invalidates everything discovered from the
+                    // old one. Clearing `tried` lets the auto-fetch re-run on
+                    // the next frame; bumping the generations drops any
+                    // in-flight job so a stale result cannot repopulate it.
+                    let mut state = OLLAMA.lock();
+                    state.models.clear();
+                    state.error = None;
+                    state.warming = None;
+                    state.warm_note = None;
+                    state.loading = false;
+                    state.tried.clear();
+                    state.fetch_rx = None;
+                    state.warm_rx = None;
+                    state.fetch_gen = state.fetch_gen.wrapping_add(1);
+                    state.warm_gen = state.warm_gen.wrapping_add(1);
                 }
                 if ui.button("Refresh models").clicked() {
                     refresh_models(&base_url);
@@ -323,21 +357,25 @@ impl SettingsApp {
             {
                 let state = OLLAMA.lock();
                 if state.loading {
-                    hint(ui, "Looking for Ollama…");
+                    hint(ui, format!("Looking for models at {base_url}…"));
                 } else if let Some(error) = &state.error {
                     ui.label(
                         RichText::new(error)
                             .size(11.0)
                             .color(egui::Color32::from_rgb(244, 160, 92)),
                     );
+                    hint(
+                        ui,
+                        "Start Ollama or fix the Base URL, then press Refresh models.",
+                    );
                 } else if let Some(warming) = &state.warming {
-                    hint(ui, format!("Loading {warming} into memory…"));
+                    hint(ui, format!("Warming {warming} in memory…"));
                 } else if let Some(note) = &state.warm_note {
                     hint(ui, note);
                 } else if state.models.is_empty() {
                     hint(
                         ui,
-                        "No models yet — press Refresh models after starting Ollama.",
+                        "No models yet — start Ollama, then press Refresh models.",
                     );
                 } else {
                     hint(
@@ -345,6 +383,16 @@ impl SettingsApp {
                         format!("{} models found on this machine.", state.models.len()),
                     );
                 }
+            }
+            // Keep the chosen model in view with an explicit warmth promise.
+            if !provider.model.is_empty() && ollama::is_ollama(provider.kind, &provider.base_url) {
+                hint(
+                    ui,
+                    format!(
+                        "Active model: {} — kept warm for 10 minutes after each use.",
+                        provider.model
+                    ),
+                );
             }
         }
 

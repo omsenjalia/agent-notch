@@ -462,6 +462,37 @@ mod tests {
     }
 
     #[test]
+    fn agent_chat_row_dispatches_without_shifting_later_rows() {
+        // The window inserts "Chat with the agent" among the ordinary rows.
+        // Hit-testing walks every row by its running height, so the new row must
+        // dispatch its own command and leave the rows after it at the right y.
+        let with_chat = vec![
+            MenuRow::item(MenuCommand::Settings, "Open Settings", glyph::SETTINGS),
+            MenuRow::item(MenuCommand::AgentChat, "Chat with the agent", glyph::AGENT),
+            MenuRow::Separator,
+            MenuRow::toggle(MenuCommand::TogglePin, "Keep open", glyph::PIN, false),
+            MenuRow::danger(MenuCommand::Quit, "Quit agent-notch", glyph::POWER),
+        ];
+        let menu = MenuView::new(with_chat, (100.0, 50.0), frame());
+        let mid_x = (menu.rect.left + menu.rect.right) * 0.5;
+        let top = menu.rect.top + PAD;
+
+        let at = |y: f32| menu.command(menu.slot_at(mid_x, y).unwrap());
+        assert_eq!(at(top + 10.0), Some(MenuCommand::Settings));
+        assert_eq!(at(top + ROW_H + 10.0), Some(MenuCommand::AgentChat));
+        // The separator takes no click; rows past it still line up.
+        assert_eq!(menu.slot_at(mid_x, top + ROW_H * 2.0 + 4.0), None);
+        assert_eq!(
+            at(top + ROW_H * 2.0 + SEP_H + 10.0),
+            Some(MenuCommand::TogglePin)
+        );
+        assert_eq!(
+            at(top + ROW_H * 3.0 + SEP_H + 10.0),
+            Some(MenuCommand::Quit)
+        );
+    }
+
+    #[test]
     fn choosing_runs_once_and_the_card_closes_away() {
         let mut menu = MenuView::new(rows(), (100.0, 50.0), frame());
         for _ in 0..30 {

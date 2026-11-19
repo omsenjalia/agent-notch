@@ -58,6 +58,20 @@ jobs:
           GALLIUM_DRIVER: llvmpipe
           LIBGL_ALWAYS_SOFTWARE: '1'
 
+      - name: Regression tests are still present
+        shell: bash
+        run: |
+          cargo test --locked --bin agent-notch -- --list > regression-tests.txt
+          for t in \
+            chat_body_has_no_keep_alive_for_local_or_hosted_providers \
+            chat_endpoint_url_normalises_whitespace_and_slashes \
+            native_warm_body_loads_without_generating \
+            agent_chat_begin_cancels_other_edit \
+            agent_chat_row_dispatches_without_shifting_later_rows \
+            reconfigure_clears_a_stale_approval_token; do
+            grep -q "$t" regression-tests.txt || { echo "Missing regression test: $t"; exit 1; }
+          done
+
       - name: Collect startup smoke diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

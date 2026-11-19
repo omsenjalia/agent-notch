@@ -1026,8 +1026,12 @@ impl NotchWindow {
     fn sync_modal_keys(&mut self, cfg: &AppConfig) {
         const MOD_NOREPEAT: u32 = 0x4000;
         let menu_up = self.menu.as_ref().is_some_and(|m| !m.closing);
-        let escape = !self.state.editing
-            && (menu_up || (cfg.notch.input.close_on_esc && self.state.open_target));
+        // Esc dismisses a menu even while the chat field is being typed into;
+        // only the panel-close hotkey is withheld during editing, so a plain
+        // Esc still reaches the editing branch as WM_KEYDOWN and cancels the
+        // edit rather than being stolen by the global hotkey.
+        let escape = menu_up
+            || (!self.state.editing && cfg.notch.input.close_on_esc && self.state.open_target);
         // (id, virtual key, wanted). Arrows repeat while held.
         let keys = [
             (HOTKEY_ESCAPE, 0x1B, escape, MOD_NOREPEAT),
@@ -1233,8 +1237,16 @@ impl NotchWindow {
                     self.state.expand.set(1.0);
                     self.state.dirty = true;
                 }
-                self.menu = None;
-                true
+                // Use the same dismissal as Esc / an outside click: let the
+                // card play its closing animation in MenuView::step(). Setting
+                // `self.menu = None` here desyncs the state, and returning true
+                // would wrongly mark the config dirty.
+                if let Some(menu) = self.menu.as_mut() {
+                    if !menu.closing {
+                        menu.close();
+                    }
+                }
+                false
             }
             MenuCommand::TogglePin => {
                 self.state.toggle_pinned();
@@ -1641,8 +1653,13 @@ impl NotchWindow {
 
         if self.state.editing {
             if cancel || lost_focus {
-                self.state.cancel_edit();
-                self.set_editing_style(cfg, false);
+                // Grabbing focus can itself report a focus-loss; the guard set
+                // by the begin-edit path absorbs that first event so typing
+                // does not get cancelled the instant it starts.
+                if self.state.edit_focus_guard == 0 {
+                    self.state.cancel_edit();
+                    self.set_editing_style(cfg, false);
+                }
             } else if commit {
                 if self.state.edit_target == EditTarget::AgentChat {
                     let text = self.state.edit_buffer.trim().to_owned();
@@ -2321,12 +2338,18 @@ impl NotchWindow {
             }
             Hit::AgentApprove => {
                 if let Some(host) = crate::agent::global() {
-                    host.set_approval(true);
+                    // A stale click must not leave an approval for a tool that
+                    // is no longer waiting for one.
+                    if host.pending_approval().is_some() {
+                        host.set_approval(true);
+                    }
                 }
             }
             Hit::AgentDeny => {
                 if let Some(host) = crate::agent::global() {
-                    host.set_approval(false);
+                    if host.pending_approval().is_some() {
+                        host.set_approval(false);
+                    }
                 }
             }
             Hit::NotifClear => crate::notch::notify::global_store().write().clear_all(),
