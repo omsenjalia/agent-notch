@@ -11,6 +11,7 @@ use crate::config::{
     StatusItem,
 };
 
+mod agent_page;
 mod color_picker;
 mod control_pages;
 mod effect_preview;
@@ -39,7 +40,7 @@ unsafe extern "system" fn enum_windows_callback(
         let len = windows::Win32::UI::WindowsAndMessaging::GetWindowTextW(hwnd, &mut buffer);
         if len > 0 {
             let text = String::from_utf16_lossy(&buffer[..len as usize]);
-            if (text.contains("Venu") || text.contains("MovingText")) && !text.contains("Tray") {
+            if (text.contains("agent-notch") || text.contains("MovingText")) && !text.contains("Tray") {
                 let out_ptr = lparam.0 as *mut isize;
                 *out_ptr = hwnd.0 as isize;
                 return windows::Win32::Foundation::BOOL(0);
@@ -58,7 +59,7 @@ pub unsafe fn find_settings_hwnd() -> Option<windows::Win32::Foundation::HWND> {
         }
     }
 
-    let title = windows::core::HSTRING::from("Venu - Settings");
+    let title = windows::core::HSTRING::from("agent-notch - Settings");
     if let Ok(hwnd) = windows::Win32::UI::WindowsAndMessaging::FindWindowW(
         None,
         windows::core::PCWSTR(title.as_ptr()),
@@ -231,6 +232,7 @@ enum Group {
     Notch,
     Screen,
     App,
+    Agent,
 }
 
 impl Group {
@@ -239,6 +241,7 @@ impl Group {
             Group::Notch => "NOTCH",
             Group::Screen => "ON SCREEN",
             Group::App => "APP",
+            Group::Agent => "AGENT",
         }
     }
 }
@@ -301,6 +304,21 @@ enum NativeNotificationAction {
 
 /// The rail, top to bottom. Order here is order on screen.
 const PAGES: &[Page] = &[
+    Page {
+        group: Group::Agent,
+        title: "Agent",
+        blurb: "The agent brain behind agent-notch: chat with the agent, what it does, \
+                and what it is allowed to run on your desktop.",
+        icon: Icon::Bolt,
+        tabs: &[
+            Tab {
+                title: "Agent",
+                keywords: "agent brain chat providers openrouter groq local ollama models \
+                           failover desktop click type launch execute approval",
+                draw: SettingsApp::tab_agent,
+            },
+        ],
+    },
     Page {
         group: Group::Notch,
         title: "General",
@@ -593,7 +611,7 @@ pub struct SettingsApp {
     /// Decoded wallpaper, kept between frames so the preview does not re-read
     /// the file sixty times a second.
     preview: wallpaper::PreviewCache,
-    /// Whether the window is on screen. Venu is a tray app: most of the time
+    /// Whether the window is on screen. agent-notch is a tray app: most of the time
     /// this is false, and a hidden window has nothing worth redrawing.
     on_screen: bool,
     /// The search box. Non-empty, the rail lists matching tabs instead.
@@ -657,7 +675,7 @@ fn load_logo(ctx: &egui::Context) -> Option<egui::TextureHandle> {
 }
 
 impl SettingsApp {
-    /// `on_screen` is false when Venu was started into the tray, which is what
+    /// `on_screen` is false when agent-notch was started into the tray, which is what
     /// the sign-in entry does.
     pub fn new(
         cc: &eframe::CreationContext<'_>,
@@ -867,7 +885,7 @@ impl SettingsApp {
         ui.painter().text(
             egui::pos2(text_x, rect.center().y - 7.0),
             Align2::LEFT_CENTER,
-            "Venu",
+            "agent-notch",
             egui::FontId::proportional(14.5),
             theme::text_primary(),
         );
@@ -1922,7 +1940,7 @@ impl SettingsApp {
         });
         ui.label(
             RichText::new(
-                "Closing the window hides it to the tray; Venu keeps running. Press Ctrl+F \
+                "Closing the window hides it to the tray; agent-notch keeps running. Press Ctrl+F \
                  anywhere to search the settings.",
             )
             .size(11.0)
@@ -1934,11 +1952,11 @@ impl SettingsApp {
         Self::section_title(ui, "STARTUP");
         let store = crate::autostart::managed_by_windows();
         let help = if store {
-            "Start Venu quietly in the tray when you sign in to Windows. Windows manages this \
+            "Start agent-notch quietly in the tray when you sign in to Windows. Windows manages this \
              for the Store version: you can also switch it in Settings \u{203A} Apps \u{203A} \
              Startup, and what you choose there wins."
         } else {
-            "Start Venu quietly in the tray when you sign in to Windows. It lives under your \
+            "Start agent-notch quietly in the tray when you sign in to Windows. It lives under your \
              user's autostart key — no admin rights — and can also be paused from Task \
              Manager's Startup list."
         };
@@ -1951,7 +1969,7 @@ impl SettingsApp {
                 .on_hover_text(if store {
                     "Uses the Store app's Windows startup task"
                 } else {
-                    "Registers venu.exe under the per-user Run key"
+                    "Registers agent-notch.exe under the per-user Run key"
                 });
             if check.changed() {
                 let result = if enabled {
@@ -1965,8 +1983,8 @@ impl SettingsApp {
                         *cx.changed = true;
                         match state {
                             crate::autostart::StartupState::BlockedByUser => Some(
-                                "Venu is switched off in Windows Settings \u{203A} Apps \u{203A} \
-                                 Startup. Switch it on there; Venu will not override your choice.",
+                                "agent-notch is switched off in Windows Settings \u{203A} Apps \u{203A} \
+                                 Startup. Switch it on there; agent-notch will not override your choice.",
                             ),
                             crate::autostart::StartupState::BlockedByPolicy => {
                                 Some("Your organisation's policy controls startup apps on this PC.")
@@ -3208,7 +3226,7 @@ impl SettingsApp {
                  for your permission first."
             } else {
                 "Showing notifications from every Windows app needs the Microsoft Store \
-                 version of Venu: Windows only lets packaged apps read the notification \
+                 version of agent-notch: Windows only lets packaged apps read the notification \
                  center. This build still shows alerts from the apps and tools above."
             })
             .size(11.0)
@@ -3243,7 +3261,7 @@ impl SettingsApp {
         ui.add_space(4.0);
         ui.label(
             RichText::new(
-                "Venu keeps the latest four in memory for this session only. Clearing them in \
+                "agent-notch keeps the latest four in memory for this session only. Clearing them in \
                  the notch does not remove anything from Windows, and nothing is saved to disk.",
             )
             .size(11.0)
@@ -3509,7 +3527,7 @@ impl SettingsApp {
         Self::section_title(ui, "SEND YOUR OWN");
         ui.label(
             RichText::new(
-                "Scripts, build tools and AI agents can raise an alert by posting JSON to Venu's \
+                "Scripts, build tools and AI agents can raise an alert by posting JSON to agent-notch's \
                  local address. It only listens on this PC.",
             )
             .size(11.0)
@@ -3563,7 +3581,7 @@ impl SettingsApp {
         ui.horizontal(|ui| {
             if ui.button("Send a test notification").clicked() {
                 crate::notch::notify::global_store().write().push(
-                    "Venu",
+                    "agent-notch",
                     "This is a test",
                     "Alerts from your allowed apps will look like this.",
                     crate::notch::notify::NotificationLevel::Info,
@@ -4536,7 +4554,7 @@ impl eframe::App for SettingsApp {
         }
 
         if ctx.input(|i| i.viewport().close_requested()) {
-            // Closing puts Venu back in the tray rather than ending it.
+            // Closing puts agent-notch back in the tray rather than ending it.
             crate::startup_log::record_event("settings_gui_close_request_processed");
             ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);
             ctx.send_viewport_cmd(egui::ViewportCommand::Visible(false));
@@ -4606,7 +4624,7 @@ impl eframe::App for SettingsApp {
                     ui.horizontal(|ui| {
                         ui.add_space(12.0);
                         ui.label(
-                            RichText::new(concat!("Venu ", env!("CARGO_PKG_VERSION")))
+                            RichText::new(concat!("agent-notch ", env!("CARGO_PKG_VERSION")))
                                 .font(egui::FontId::monospace(10.0))
                                 .color(theme::text_tertiary()),
                         );

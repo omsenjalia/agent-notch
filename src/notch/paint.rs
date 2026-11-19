@@ -1362,6 +1362,10 @@ impl Painter {
         let inner_w = (shape.width() - pad * 2.0).max(10.0);
 
         match slide {
+            SlideKind::Agent => {
+                // Closed-pill face for the agent slide: the Open panel draws
+                // the chat in the Agent slide's own panel.
+            }
             SlideKind::Clock => {
                 let clock = Clock::now();
                 let time = clock.time_string(cfg.notch.clock_24h);
@@ -2313,6 +2317,7 @@ impl Painter {
             }
             SlideKind::Shelf => self.paint_shelf(t, cfg, body, alpha, generation),
             SlideKind::Clipboard => self.paint_clipboard(t, cfg, body, alpha),
+            SlideKind::Agent => self.paint_agent_panel(t, cfg, body, alpha),
             SlideKind::Notifications => self.paint_notifications(t, cfg, state, body, alpha),
             SlideKind::Usage => self.paint_usage(t, cfg, body, alpha),
             SlideKind::Stats => self.paint_stats(t, cfg, body, alpha),

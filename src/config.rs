@@ -203,14 +203,16 @@ pub enum SlideKind {
     /// One-click switches: microphone, sound, dark mode, keep awake.
     Controls,
     /// Pinned files, folders, apps and scripts, plus the newest files of one
-    /// folder. Venu stores paths only, never copies.
+    /// folder. agent-notch stores paths only, never copies.
     Shelf,
     /// Recently copied text, one click to copy it again. Opt-in, memory only.
     Clipboard,
+    /// The agent brain: chat with the agent, see what it does.
+    Agent,
 }
 
 impl SlideKind {
-    pub const ALL: [SlideKind; 13] = [
+    pub const ALL: [SlideKind; 14] = [
         SlideKind::Status,
         SlideKind::Clock,
         SlideKind::Marquee,
@@ -224,6 +226,7 @@ impl SlideKind {
         SlideKind::Controls,
         SlideKind::Shelf,
         SlideKind::Clipboard,
+        SlideKind::Agent,
     ];
 
     /// The deck a fresh install starts with: everything except clipboard
@@ -250,6 +253,7 @@ impl SlideKind {
             SlideKind::Controls => "Quick Toggles",
             SlideKind::Shelf => "Shelf",
             SlideKind::Clipboard => "Clipboard",
+            SlideKind::Agent => "Agent",
         }
     }
 }
@@ -801,7 +805,7 @@ impl MarqueeConfig {
 /// touching any slider afterwards turns it into [`ShapePreset::Custom`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum ShapePreset {
-    /// The original Venu silhouette.
+    /// The original agent-notch silhouette.
     #[default]
     Classic,
     /// Fully round ends with small shoulders — the phone-island look.
@@ -1926,11 +1930,14 @@ pub struct AppConfig {
     /// The settings window's glass, and whether it floats above others.
     #[serde(default)]
     pub settings_window: SettingsWindowConfig,
-    /// Whether Venu registers itself to start when Windows signs in. The
+    /// Whether agent-notch registers itself to start when Windows signs in. The
     /// registry side of this lives in `crate::autostart`; the entry is
     /// refreshed against this flag on every launch.
     #[serde(default)]
     pub launch_on_startup: bool,
+    /// The agent brain: provider chain, chat, and desktop control.
+    #[serde(default)]
+    pub agent: crate::agent::config::AgentConfig,
 }
 
 fn default_phrase_spacing() -> u32 {
@@ -1940,7 +1947,7 @@ fn default_phrase_spacing() -> u32 {
 impl Default for AppConfig {
     fn default() -> Self {
         Self {
-            text: "⭐ REMINDER: Stay focused & stay hydrated! • Venu Dynamic Notch ⭐".to_string(),
+            text: "⭐ REMINDER: Stay focused & stay hydrated! • agent-notch Dynamic Notch ⭐".to_string(),
             overlay_enabled: true,
             phrase_spacing: 6,
             edges: EdgeSelection::default(),
@@ -1959,6 +1966,7 @@ impl Default for AppConfig {
             flash: FlashConfig::default(),
             settings_window: SettingsWindowConfig::default(),
             launch_on_startup: false,
+            agent: crate::agent::config::AgentConfig::default(),
         }
     }
 }
@@ -1985,7 +1993,7 @@ impl AppConfig {
 
     pub fn config_path() -> PathBuf {
         if let Some(mut path) = app_config_directory() {
-            path.push("venu");
+            path.push("agent-notch");
             let _ = fs::create_dir_all(&path);
             path.push("config.json");
             path
@@ -2009,7 +2017,7 @@ impl AppConfig {
             }
         }
 
-        // Backward compatibility fallback: check legacy movingtext path if venu doesn't exist yet
+        // Backward compatibility fallback: check legacy movingtext path if agent-notch doesn't exist yet
         if let Some(mut legacy_path) = app_config_directory() {
             legacy_path.push("movingtext");
             legacy_path.push("config.json");
@@ -2081,7 +2089,7 @@ mod tests {
 
     #[test]
     fn notch_config_written_before_shape_split_and_pods_still_loads() {
-        // Strip the new keys out of a current config, as an older Venu
+        // Strip the new keys out of a current config, as an older agent-notch
         // would have written it, and read it back.
         let mut value = serde_json::to_value(AppConfig::default()).unwrap();
         let notch = value["notch"].as_object_mut().unwrap();

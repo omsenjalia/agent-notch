@@ -203,7 +203,7 @@ pub fn tick(cfg: &TimerConfig, toast_secs: f32) {
         }
     };
     drop(t);
-    // An empty allow-list lets Venu's own alerts through whatever the user's
+    // An empty allow-list lets agent-notch's own alerts through whatever the user's
     // app filter says.
     notify::global_store().write().push(
         "Focus Timer",

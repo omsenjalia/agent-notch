@@ -848,7 +848,7 @@ impl Painter {
             self.centred_label(
                 t,
                 family,
-                "Or add them in Settings \u{203A} Slides \u{203A} Shelf. Venu keeps the path, never a copy.",
+                "Or add them in Settings \u{203A} Slides \u{203A} Shelf. agent-notch keeps the path, never a copy.",
                 11.0,
                 DWRITE_FONT_WEIGHT_MEDIUM,
                 body,
@@ -988,6 +988,46 @@ impl Painter {
     }
 
     // -- Clipboard --------------------------------------------------------------
+
+    /// The Agent slide: a label and the brain's status. Status comes from
+    /// the global agent host, so this stays zero-work while the brain is idle.
+    pub(super) fn paint_agent_panel(
+        &mut self,
+        t: &ID2D1DCRenderTarget,
+        cfg: &AppConfig,
+        body: D2D_RECT_F,
+        alpha: f32,
+    ) {
+        let family = &cfg.notch.font_family;
+        let status = crate::agent::global()
+            .map(|host| host.status())
+            .unwrap_or(crate::agent::Status::Idle);
+        let status_text = match &status {
+            crate::agent::Status::Idle => "Agent: idle".to_owned(),
+            crate::agent::Status::Thinking => "Agent: thinking…".to_owned(),
+            crate::agent::Status::Approval(tool) => format!("Agent: {tool} — approve?"),
+        };
+        self.centred_label(
+            t,
+            family,
+            "AGENT",
+            theme::SIZE_LABEL - 1.0,
+            DWRITE_FONT_WEIGHT_EXTRA_BOLD,
+            body,
+            body.top + 8.0,
+            theme::fade(self.pal.text_lo, alpha),
+        );
+        self.centred_label(
+            t,
+            family,
+            &status_text,
+            12.0,
+            DWRITE_FONT_WEIGHT_MEDIUM,
+            body,
+            (body.top + body.bottom) * 0.5,
+            theme::fade(self.pal.text_hi, alpha),
+        );
+    }
 
     pub(super) fn paint_clipboard(
         &mut self,

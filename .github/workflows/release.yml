@@ -106,8 +106,8 @@ jobs:
         if: steps.signing.outputs.enabled == 'true'
         uses: actions/upload-artifact@v6
         with:
-          name: venu-app-unsigned
-          path: target/release/venu.exe
+          name: agent-notch-app-unsigned
+          path: target/release/agent-notch.exe
           if-no-files-found: error
           retention-days: 1
 
@@ -126,21 +126,21 @@ jobs:
       - name: Use the signed app
         if: steps.signing.outputs.enabled == 'true'
         shell: pwsh
-        run: Copy-Item "signed/app/venu.exe" "target/release/venu.exe" -Force
+        run: Copy-Item "signed/app/agent-notch.exe" "target/release/agent-notch.exe" -Force
 
       - name: Build installer with Inno Setup
         shell: pwsh
         run: |
           choco install innosetup -y --no-progress
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=$env:VERSION "packaging/venu.iss"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=$env:VERSION "packaging/agent-notch.iss"
 
       - name: Upload the installer for signing
         id: upload-setup
         if: steps.signing.outputs.enabled == 'true'
         uses: actions/upload-artifact@v6
         with:
-          name: venu-setup-unsigned
-          path: dist/venu-setup-*.exe
+          name: agent-notch-setup-unsigned
+          path: dist/agent-notch-setup-*.exe
           if-no-files-found: error
           retention-days: 1
 
@@ -163,7 +163,7 @@ jobs:
 
       - name: Rename binary with version tag
         shell: pwsh
-        run: Copy-Item "target/release/venu.exe" "venu-$env:VERSION.exe"
+        run: Copy-Item "target/release/agent-notch.exe" "agent-notch-$env:VERSION.exe"
 
       - name: Extract this version's notes from CHANGELOG.md
         shell: bash
@@ -184,7 +184,7 @@ jobs:
           tag_name: v${{ env.VERSION }}
           target_commitish: ${{ github.sha }}
           files: |
-            venu-*.exe
-            dist/venu-setup-*.exe
+            agent-notch-*.exe
+            dist/agent-notch-setup-*.exe
           body_path: release-notes.md
           generate_release_notes: true

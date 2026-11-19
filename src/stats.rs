@@ -85,7 +85,7 @@ impl StatsService {
         let shared = Arc::new((Mutex::new(SharedState::default()), Condvar::new()));
         let worker_state = Arc::clone(&shared);
         if let Err(error) = std::thread::Builder::new()
-            .name("venu-stats".to_string())
+            .name("agent-notch-stats".to_string())
             .spawn(move || sample_worker(worker_state))
         {
             eprintln!("[stats] could not start sampling worker: {error}");

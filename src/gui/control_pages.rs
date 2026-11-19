@@ -620,7 +620,7 @@ impl SettingsApp {
         Self::section_title(ui, "PINNED");
         ui.label(
             RichText::new(
-                "Files, folders, apps and scripts, one click away in the notch. Venu stores \
+                "Files, folders, apps and scripts, one click away in the notch. agent-notch stores \
                  only the path: nothing is copied or moved. You can also drop files on the \
                  notch, and right-click an item there for more.",
             )
@@ -700,7 +700,7 @@ impl SettingsApp {
             RichText::new(
                 "Show the newest files of one folder beside the pins, such as Screenshots or \
                  Downloads. Click one to open it; right-click to copy it, ready to paste into \
-                 a chat or a document. Venu only looks again when Windows says the folder \
+                 a chat or a document. agent-notch only looks again when Windows says the folder \
                  changed.",
             )
             .size(11.0)
@@ -765,7 +765,7 @@ impl SettingsApp {
         ui.label(
             RichText::new(
                 "The last few things you copied, one click to copy again. Kept in memory only: \
-                 never written to disk, gone when Venu closes or this is switched off. Anything \
+                 never written to disk, gone when agent-notch closes or this is switched off. Anything \
                  a password manager marks as private is skipped.",
             )
             .size(11.0)

@@ -346,6 +346,7 @@ fn sample(kind: SlideKind) -> &'static str {
         SlideKind::Shelf => "3 pinned",
         SlideKind::Clipboard => "Copied text",
         SlideKind::Controls => "Toggles",
+        SlideKind::Agent => "Agent chat",
     }
 }
 

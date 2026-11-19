@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/file_00000000305c821187409948f43d9797.png" alt="Venu logo" width="120">
+  <img src="assets/file_00000000305c821187409948f43d9797.png" alt="agent-notch logo" width="120">
 </p>
 
-<h1 align="center">Venu</h1>
+<h1 align="center">agent-notch</h1>
 
 <p align="center">
   <strong>Dynamic Notch for Windows</strong>
@@ -13,28 +13,28 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/imnakul/venu---Dynamic-Notch-for-Windows/releases"><img src="https://img.shields.io/github/v/release/imnakul/venu---Dynamic-Notch-for-Windows?style=flat-square&label=download" alt="Latest release"></a>
-  <a href="https://github.com/imnakul/venu---Dynamic-Notch-for-Windows/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/imnakul/venu---Dynamic-Notch-for-Windows/ci.yml?branch=main&label=build&style=flat-square" alt="Build status"></a>
+  <a href="https://github.com/imnakul/agent-notch---Dynamic-Notch-for-Windows/releases"><img src="https://img.shields.io/github/v/release/imnakul/agent-notch---Dynamic-Notch-for-Windows?style=flat-square&label=download" alt="Latest release"></a>
+  <a href="https://github.com/imnakul/agent-notch---Dynamic-Notch-for-Windows/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/imnakul/agent-notch---Dynamic-Notch-for-Windows/ci.yml?branch=main&label=build&style=flat-square" alt="Build status"></a>
   <img src="https://img.shields.io/badge/platform-Windows%2010%2F11-0A0A0D.svg?style=flat-square" alt="Platform: Windows">
   <img src="https://img.shields.io/badge/built%20with-Rust-orange.svg?style=flat-square" alt="Built with Rust">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License: MIT">
 </p>
 
 <p align="center">
-  <img src="assets/file_00000000782082119e0fbfaad14b1fa3.png" alt="Venu Dynamic Notch for Windows showing normal and expanded glass notch states, media controls, AI coding usage tracking for Claude Code, OpenAI Codex and Antigravity, desktop alerts, and system information" width="1200">
+  <img src="assets/file_00000000782082119e0fbfaad14b1fa3.png" alt="agent-notch Dynamic Notch for Windows showing normal and expanded glass notch states, media controls, AI coding usage tracking for Claude Code, OpenAI Codex and Antigravity, desktop alerts, and system information" width="1200">
 </p>
 
-## What is Venu?
+## What is agent-notch?
 
-Venu brings a Dynamic Island-style experience to Windows and turns the unused space around the top of your desktop into a useful, contextual information surface.
+agent-notch brings a Dynamic Island-style experience to Windows and turns the unused space around the top of your desktop into a useful, contextual information surface.
 
 See the time, control media, read notifications, track your current focus, display reminders, monitor AI coding tool usage, and receive alerts from developer tools without constantly switching windows.
 
-Venu is designed to feel native, lightweight, and unobtrusive. It runs locally, uses hardware-accelerated rendering, and does not require an account or cloud service.
+agent-notch is designed to feel native, lightweight, and unobtrusive. It runs locally, uses hardware-accelerated rendering, and does not require an account or cloud service.
 
-## Why Venu?
+## Why agent-notch?
 
-Your desktop is where you already work. Venu puts useful information where you can see it without adding another full application window.
+Your desktop is where you already work. agent-notch puts useful information where you can see it without adding another full application window.
 
 - Dynamic Notch for Windows
 - Live media controls and now-playing information
@@ -49,7 +49,7 @@ Your desktop is where you already work. Venu puts useful information where you c
 
 ## AI Coding Usage Tracker
 
-Venu can display AI coding tool usage directly inside the Windows Dynamic Notch.
+agent-notch can display AI coding tool usage directly inside the Windows Dynamic Notch.
 
 Supported usage views include:
 
@@ -57,9 +57,9 @@ Supported usage views include:
 - **OpenAI Codex**: usage information directly in the notch
 - **Google Antigravity**: usage information directly in the notch
 
-This makes Venu especially useful for developers who spend most of their day working with AI coding agents. Instead of opening separate dashboards or repeatedly checking terminal output, important usage information can stay visible in the desktop HUD.
+This makes agent-notch especially useful for developers who spend most of their day working with AI coding agents. Instead of opening separate dashboards or repeatedly checking terminal output, important usage information can stay visible in the desktop HUD.
 
-Venu also includes notification hooks for developer tools and AI agents such as Claude Code, Codex, and Antigravity, allowing scripts and development workflows to send events directly to the Dynamic Notch.
+agent-notch also includes notification hooks for developer tools and AI agents such as Claude Code, Codex, and Antigravity, allowing scripts and development workflows to send events directly to the Dynamic Notch.
 
 ## Features
 
@@ -100,7 +100,7 @@ Available slides include:
 - **Focus Timer**: Pomodoro rounds and breaks, with the countdown in the resting pill
 - **Calendar**: your next meeting and what follows, from a Google Calendar or Outlook iCal link
 - **Quick Toggles**: mute the microphone or sound, switch dark mode, keep the PC awake
-- **Shelf**: pinned files, folders, apps and `.bat` scripts, plus the newest files of a folder such as Screenshots; one click opens, right-click copies (Venu stores paths only, never copies)
+- **Shelf**: pinned files, folders, apps and `.bat` scripts, plus the newest files of a folder such as Screenshots; one click opens, right-click copies (agent-notch stores paths only, never copies)
 - **Clipboard**: the last few things you copied, one click to copy again (opt-in, memory only, private content skipped)
 
 <p align="center">
@@ -167,7 +167,7 @@ The notch can play an effect around its edge on an interval or continuously: Rai
 
 Control media playback without leaving your current application.
 
-Venu integrates with Windows System Media Transport Controls to show the currently playing track, artist, artwork, playback state, and controls for play, pause, previous, and next.
+agent-notch integrates with Windows System Media Transport Controls to show the currently playing track, artist, artwork, playback state, and controls for play, pause, previous, and next.
 
 - A centred player: the album cover or video thumbnail large in the middle, the title, artist or channel and the app under it, then the timeline and controls
 - A live equaliser on the pill and the media pod that follows what is actually playing
@@ -186,13 +186,13 @@ Turn the Dynamic Notch into a lightweight notification hub.
 - Custom animated notification glow styles
 - Local webhook support for external tools and scripts
 - Charging, unplugged and low-battery alerts
-- **Microsoft Store version:** notifications from every Windows app, with your permission. Windows only lets packaged apps read the notification center, so the portable and installer builds show alerts from the webhook only. Venu keeps the latest four in memory for the session; nothing is written to disk.
+- **Microsoft Store version:** notifications from every Windows app, with your permission. Windows only lets packaged apps read the notification center, so the portable and installer builds show alerts from the webhook only. agent-notch keeps the latest four in memory for the session; nothing is written to disk.
 
 ### AI Agent and Developer Notifications
 
-Venu can act as a small desktop HUD for your development workflow.
+agent-notch can act as a small desktop HUD for your development workflow.
 
-CLI hooks in `scripts/notch-hooks/` allow external tools, build scripts, AI agents, and development workflows to send instant notifications to Venu.
+CLI hooks in `scripts/notch-hooks/` allow external tools, build scripts, AI agents, and development workflows to send instant notifications to agent-notch.
 
 This can be useful for events such as:
 
@@ -203,7 +203,7 @@ This can be useful for events such as:
 - Background scripts finishing
 - Agent attention or approval requests
 
-Work in progress can also be shown as a satellite pod. Post to `/activity` when something starts, and Venu shows a pod counting up beside the notch:
+Work in progress can also be shown as a satellite pod. Post to `/activity` when something starts, and agent-notch shows a pod counting up beside the notch:
 
 ```bash
 curl -X POST http://127.0.0.1:18923/activity -H "Content-Type: application/json" \
@@ -238,8 +238,8 @@ A floating glass window that sits beside your work. Seven pages in three groups,
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/settings-general.png" alt="Venu Settings, General page: switches for showing the notch, keeping it on top, click-through and scroll-to-switch"></td>
-    <td><img src="docs/screenshots/settings-accent-and-glass.png" alt="Venu Settings, Preferences page: accent colour swatches and the Glass strength slider"></td>
+    <td><img src="docs/screenshots/settings-general.png" alt="agent-notch Settings, General page: switches for showing the notch, keeping it on top, click-through and scroll-to-switch"></td>
+    <td><img src="docs/screenshots/settings-accent-and-glass.png" alt="agent-notch Settings, Preferences page: accent colour swatches and the Glass strength slider"></td>
   </tr>
   <tr>
     <td align="center"><sub>General</sub></td>
@@ -248,14 +248,14 @@ A floating glass window that sits beside your work. Seven pages in three groups,
 </table>
 
 <p align="center">
-  <img src="docs/screenshots/settings-wallpaper.png" alt="Venu Settings, Slides page, Wallpaper tab: the chosen image framed exactly as the open notch will show it, with a zoom slider" width="720">
+  <img src="docs/screenshots/settings-wallpaper.png" alt="agent-notch Settings, Slides page, Wallpaper tab: the chosen image framed exactly as the open notch will show it, with a zoom slider" width="720">
   <br>
   <sub>Framing a wallpaper for the notch.</sub>
 </p>
 
 ### Glass and Surface Themes
 
-Venu includes multiple visual treatments designed to work with different Windows desktops and wallpapers.
+agent-notch includes multiple visual treatments designed to work with different Windows desktops and wallpapers.
 
 - Dark / Obsidian
 - Light
@@ -268,7 +268,7 @@ The notch can sample the desktop wallpaper and extract dominant colors for adapt
 
 ### Modern Color Editor
 
-Venu includes a precision color editor instead of relying on the default Windows color picker.
+agent-notch includes a precision color editor instead of relying on the default Windows color picker.
 
 - 2D saturation and value canvas
 - Hue spectrum slider
@@ -281,7 +281,7 @@ Venu includes a precision color editor instead of relying on the default Windows
 
 ### System Tray and Windows Integration
 
-Venu is designed to run quietly in the background.
+agent-notch is designed to run quietly in the background.
 
 - System tray support
 - Quick controls and Settings access from the tray, plus a Settings button in the notch
@@ -294,7 +294,7 @@ Venu is designed to run quietly in the background.
 
 ## Privacy First
 
-Venu is designed as a local-first Windows application.
+agent-notch is designed as a local-first Windows application.
 
 - No account required
 - No telemetry
@@ -302,52 +302,52 @@ Venu is designed as a local-first Windows application.
 - No mandatory online service
 - Configuration stored locally on your PC
 
-AI usage information is displayed locally by Venu based on the integrations and local data available to the application.
+AI usage information is displayed locally by agent-notch based on the integrations and local data available to the application.
 
 ## Installation
 
 ### Installer (recommended)
 
-Download `venu-setup-x.y.z.exe` from the [GitHub Releases](https://github.com/imnakul/venu---Dynamic-Notch-for-Windows/releases) page and run it. The installer:
+Download `agent-notch-setup-x.y.z.exe` from the [GitHub Releases](https://github.com/imnakul/agent-notch---Dynamic-Notch-for-Windows/releases) page and run it. The installer:
 
-- installs Venu per-user into `%LOCALAPPDATA%\Programs\Venu` — no administrator rights needed
+- installs agent-notch per-user into `%LOCALAPPDATA%\Programs\agent-notch` — no administrator rights needed
 - adds a Start Menu shortcut (and optionally a desktop shortcut)
-- offers to enable **Launch on startup**, so Venu is already running quietly in the tray the next time you turn your PC on
+- offers to enable **Launch on startup**, so agent-notch is already running quietly in the tray the next time you turn your PC on
 - ships an uninstaller that removes all of the above
 
 ### Portable
 
-Download `venu-x.y.z.exe` from the Releases page and run it directly. No installation, no admin rights. Venu starts quietly in the tray; choose **Open Settings** from the tray menu or use the notch's Settings button. Run `venu-x.y.z.exe --settings` when you want to open Settings on launch.
+Download `agent-notch-x.y.z.exe` from the Releases page and run it directly. No installation, no admin rights. agent-notch starts quietly in the tray; choose **Open Settings** from the tray menu or use the notch's Settings button. Run `agent-notch-x.y.z.exe --settings` when you want to open Settings on launch.
 
-Either way, **Launch on startup** can be toggled any time from **Settings > App > Preferences**. The setting lives under your user profile (`HKCU\...\CurrentVersion\Run`), keeps pointing at the copy of Venu you last ran, and a sign-in start stays quiet in the tray instead of opening the settings window. `--startup` and `--minimized` also keep the launch quiet; an explicit `--settings` opens the window even when one of those flags is present. Only one Venu runs at a time.
+Either way, **Launch on startup** can be toggled any time from **Settings > App > Preferences**. The setting lives under your user profile (`HKCU\...\CurrentVersion\Run`), keeps pointing at the copy of agent-notch you last ran, and a sign-in start stays quiet in the tray instead of opening the settings window. `--startup` and `--minimized` also keep the launch quiet; an explicit `--settings` opens the window even when one of those flags is present. Only one agent-notch runs at a time.
 
 ### Build from Source
 
-Venu is built with Rust and targets Windows 10 and Windows 11.
+agent-notch is built with Rust and targets Windows 10 and Windows 11.
 
 Install the stable [Rust toolchain](https://www.rust-lang.org/tools/install), then run:
 
 ```bash
-git clone https://github.com/imnakul/venu---Dynamic-Notch-for-Windows.git
-cd venu---Dynamic-Notch-for-Windows
+git clone https://github.com/imnakul/agent-notch---Dynamic-Notch-for-Windows.git
+cd agent-notch---Dynamic-Notch-for-Windows
 cargo build --release
 ```
 
 The compiled executable will be available at:
 
 ```text
-target/release/venu.exe
+target/release/agent-notch.exe
 ```
 
 To build the Windows installer as well, install [Inno Setup 6](https://jrsoftware.org/isinfo.php) and run:
 
 ```bash
-iscc packaging/venu.iss
+iscc packaging/agent-notch.iss
 ```
 
-The setup executable is written to `dist/venu-setup-<version>.exe`. A tooling-free per-user install/uninstall is also available as `scripts/install.ps1` / `scripts/uninstall.ps1`.
+The setup executable is written to `dist/agent-notch-setup-<version>.exe`. A tooling-free per-user install/uninstall is also available as `scripts/install.ps1` / `scripts/uninstall.ps1`.
 
-## How to Use Venu
+## How to Use agent-notch
 
 ### Dynamic Notch
 
@@ -359,7 +359,7 @@ The setup executable is written to `dist/venu-setup-<version>.exe`. A tooling-fr
 
 ### AI Usage Tracker
 
-Open the AI Usage slide to view supported AI coding tool usage directly in the notch. Configure the available integrations from the corresponding Venu settings.
+Open the AI Usage slide to view supported AI coding tool usage directly in the notch. Configure the available integrations from the corresponding agent-notch settings.
 
 ### Edge Marquee
 
@@ -371,7 +371,7 @@ Open the AI Usage slide to view supported AI coding tool usage directly in the n
 
 ### Colors and Themes
 
-1. Open any Venu color setting.
+1. Open any agent-notch color setting.
 2. Select the color capsule to open the color editor.
 3. Adjust saturation, brightness, hue, and opacity.
 4. Use HEX, RGB, or HSV input when precise values are required.
@@ -379,17 +379,17 @@ Open the AI Usage slide to view supported AI coding tool usage directly in the n
 
 ## Configuration
 
-Venu automatically stores preferences and state locally at:
+agent-notch automatically stores preferences and state locally at:
 
 ```text
-%APPDATA%\venu\config.json
+%APPDATA%\agent-notch\config.json
 ```
 
-To reset Venu to its default configuration, close the application and delete this file.
+To reset agent-notch to its default configuration, close the application and delete this file.
 
 ## Technology
 
-Venu is built as a native Windows desktop application with a focus on performance and responsive visual rendering.
+agent-notch is built as a native Windows desktop application with a focus on performance and responsive visual rendering.
 
 - **Language**: Rust 2021
 - **GUI**: egui and eframe
@@ -400,15 +400,15 @@ Venu is built as a native Windows desktop application with a focus on performanc
 
 ## For Developers
 
-Venu is also designed to be useful inside a developer workflow.
+agent-notch is also designed to be useful inside a developer workflow.
 
-External applications can communicate with the Venu notification system through local hooks and the notification webhook. This makes it possible to integrate Venu with scripts, CI workflows, AI coding agents, development tools, and other local applications.
+External applications can communicate with the agent-notch notification system through local hooks and the notification webhook. This makes it possible to integrate agent-notch with scripts, CI workflows, AI coding agents, development tools, and other local applications.
 
 The goal is simple: when something important finishes in the background, your desktop should be able to tell you without forcing you to keep another terminal or dashboard open.
 
 ## Roadmap
 
-Venu is actively evolving. Planned and experimental areas include improvements to:
+agent-notch is actively evolving. Planned and experimental areas include improvements to:
 
 - AI coding tool integrations
 - Dynamic Notch information surfaces
@@ -432,8 +432,31 @@ Please keep changes focused and ensure the project builds without warnings where
 
 ## License
 
-Venu is licensed under the [MIT License](LICENSE).
+agent-notch is licensed under the [MIT License](LICENSE).
 
 ## Keywords
 
-Venu, Dynamic Notch for Windows, Dynamic Island for Windows, Windows Dynamic Island, Windows notch, Windows desktop HUD, Windows desktop companion, Windows notification HUD, Windows media controls, Windows desktop customization, Windows productivity tool, Windows AI coding tools, Claude Code usage tracker, Claude usage tracker, Codex usage tracker, OpenAI Codex usage, Google Antigravity usage tracker, Antigravity usage tracker, AI coding agent notifications, Windows developer tools, Windows Rust application, Rust desktop application, Windows 10, Windows 11.
+agent-notch, Dynamic Notch for Windows, Dynamic Island for Windows, Windows Dynamic Island, Windows notch, Windows desktop HUD, Windows desktop companion, Windows notification HUD, Windows media controls, Windows desktop customization, Windows productivity tool, Windows AI coding tools, Claude Code usage tracker, Claude usage tracker, Codex usage tracker, OpenAI Codex usage, Google Antigravity usage tracker, Antigravity usage tracker, AI coding agent notifications, Windows developer tools, Windows Rust application, Rust desktop application, Windows 10, Windows 11.
+
+## Agentic Brain
+
+agent-notch includes an agent brain: an AI worker behind the **Agent** slide
+(Settings › Agent) and a Settings page of the same name.
+
+- **Provider chain** — OpenRouter, Groq, or any OpenAI-compatible server
+  (LM Studio, llama.cpp) plus local Ollama at `127.0.0.1:11434/v1` by default.
+  Providers are tried in order; one that runs out (429/5xx/network) is marked
+  down and the next takes over automatically.
+- **API keys** are read from environment variables (never stored in
+  config.json). Mark a provider's model as the *decision model* to have a
+  fast local model parse your speech into actions.
+- **Screen awareness** — the brain reads the foreground window, clipboard and
+  (when a vision-capable provider is configured) screenshots of your screens.
+- **Desktop control** — click, type, chord keys, scroll, drag, window
+  listing/activation, launching apps, clipboard read/write, shell commands.
+- **Approvals** — ask-first by default: read-only tools run freely, mutations
+  ask. Autonomous mode runs mutations except irreversible ones
+  (`execute_command`).
+
+Chat with the agent in Settings › Agent. Voice input/output is planned for
+the next stage (local TTS/STT via whisper.cpp + Piper/kokoro-style servers).

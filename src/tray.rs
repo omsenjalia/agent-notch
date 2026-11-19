@@ -30,7 +30,7 @@ static TRAY_CLASS_NAME: &str = "VenuTrayClass";
 /// Explorer broadcasts this registered message to every top-level window
 /// whenever it (re)starts — after a crash, an `explorer.exe` restart, or
 /// because it simply wasn't up yet when this app registered its icon (the
-/// case when Venu is set to launch at sign-in). Every tray icon on the
+/// case when agent-notch is set to launch at sign-in). Every tray icon on the
 /// system is gone at that point; the fix is to listen for it and re-add.
 static WM_TASKBAR_CREATED: AtomicU32 = AtomicU32::new(0);
 
@@ -84,9 +84,9 @@ pub struct SystemTray {
 unsafe impl Send for SystemTray {}
 unsafe impl Sync for SystemTray {}
 
-/// The Venu logo from the icon resource `build.rs` embeds in the exe (id 1),
+/// The agent-notch logo from the icon resource `build.rs` embeds in the exe (id 1),
 /// loaded at the shell's small-icon size so the tray picks the matching
-/// entry from `assets/venu.ico` at any display scaling instead of
+/// entry from `assets/agent-notch.ico` at any display scaling instead of
 /// shrinking a large one.
 fn create_app_icon() -> windows::core::Result<HICON> {
     const APP_ICON_ID: usize = 1;
@@ -108,7 +108,7 @@ pub fn restore_settings_window() {
     request_settings_window();
 }
 
-/// Ask the already-running Venu instance to open its Settings window. This is
+/// Ask the already-running agent-notch instance to open its Settings window. This is
 /// used when a second launch explicitly supplies `--settings`.
 pub fn request_existing_settings() {
     unsafe {
@@ -174,7 +174,7 @@ impl SystemTray {
                 ..Default::default()
             };
 
-            let tip = "Venu - Dynamic Notch for Windows\0"
+            let tip = "agent-notch - Dynamic Notch for Windows\0"
                 .encode_utf16()
                 .collect::<Vec<u16>>();
             let len = tip.len().min(nid.szTip.len());
@@ -192,7 +192,7 @@ impl SystemTray {
             WM_TASKBAR_CREATED.store(taskbar_created, Ordering::SeqCst);
 
             if !Shell_NotifyIconW(NIM_ADD, &nid).as_bool() {
-                debug_log("Venu: Shell_NotifyIconW(NIM_ADD) failed — tray icon not registered yet, will retry on TaskbarCreated");
+                debug_log("agent-notch: Shell_NotifyIconW(NIM_ADD) failed — tray icon not registered yet, will retry on TaskbarCreated");
             }
 
             Ok(Self { hwnd, nid, hicon })

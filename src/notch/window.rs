@@ -94,7 +94,7 @@ const AMBIENT_FRAME: Duration = Duration::from_millis(90);
 ///
 /// `EnumDisplayMonitors` is a syscall per display and a monitor arriving or
 /// leaving is not a per-frame event — but it does have to be picked up
-/// without restarting Venu, so it is polled rather than cached forever.
+/// without restarting agent-notch, so it is polled rather than cached forever.
 const MONITOR_REFRESH: Duration = Duration::from_secs(2);
 
 /// How often the notch re-asserts its place in the z-order while it is idle.
@@ -528,7 +528,7 @@ impl NotchWindow {
 
         let hwnd = unsafe {
             let name = HSTRING::from(CLASS_NAME);
-            let title = HSTRING::from("Venu Notch");
+            let title = HSTRING::from("agent-notch Notch");
             CreateWindowExW(
                 windows::Win32::UI::WindowsAndMessaging::WINDOW_EX_STYLE(ex_style),
                 PCWSTR(name.as_ptr()),
@@ -1178,7 +1178,7 @@ impl NotchWindow {
         rows.push(MenuRow::Separator);
         rows.push(MenuRow::danger(
             MenuCommand::Quit,
-            "Quit Venu",
+            "Quit agent-notch",
             glyph::POWER,
         ));
         rows

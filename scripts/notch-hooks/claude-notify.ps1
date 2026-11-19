@@ -1,4 +1,4 @@
-# Claude Code Notification/Stop hook -> Venu notch webhook.
+# Claude Code Notification/Stop hook -> agent-notch notch webhook.
 # Registered in ~/.claude/settings.json under hooks.Notification and hooks.Stop.
 # Claude Code pipes the event JSON to this script's stdin.
 

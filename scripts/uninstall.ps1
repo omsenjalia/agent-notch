@@ -1,10 +1,10 @@
-# Per-user uninstaller for Venu - the counterpart to scripts\install.ps1.
+# Per-user uninstaller for agent-notch - the counterpart to scripts\install.ps1.
 #
 #   powershell -ExecutionPolicy Bypass -File scripts\uninstall.ps1
 #   powershell -ExecutionPolicy Bypass -File scripts\uninstall.ps1 -PurgeConfig
 #
 # Removes the autostart entry, shortcuts and the installed files. Settings in
-# %APPDATA%\venu are kept unless -PurgeConfig is passed, so a reinstall comes
+# %APPDATA%\agent-notch are kept unless -PurgeConfig is passed, so a reinstall comes
 # back exactly as it was left.
 [CmdletBinding()]
 param(
@@ -13,25 +13,25 @@ param(
 
 $ErrorActionPreference = "SilentlyContinue"
 
-Get-Process venu | Stop-Process -Force
+Get-Process agent-notch | Stop-Process -Force
 Start-Sleep -Milliseconds 500
 
 # Autostart entry, plus the Task Manager approval leftover next to it.
-Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Venu"
-Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run" -Name "Venu"
+Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "agent-notch"
+Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run" -Name "agent-notch"
 
-$group = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Venu"
-Remove-Item (Join-Path $group "Venu.lnk") -Force
+$group = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\agent-notch"
+Remove-Item (Join-Path $group "agent-notch.lnk") -Force
 Remove-Item $group -Force
-Remove-Item (Join-Path ([Environment]::GetFolderPath("Desktop")) "Venu.lnk") -Force
+Remove-Item (Join-Path ([Environment]::GetFolderPath("Desktop")) "agent-notch.lnk") -Force
 
-$dest = Join-Path $env:LOCALAPPDATA "Programs\Venu"
+$dest = Join-Path $env:LOCALAPPDATA "Programs\agent-notch"
 if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }
 
-Write-Host "Venu uninstalled."
+Write-Host "agent-notch uninstalled."
 if ($PurgeConfig) {
-    Remove-Item (Join-Path $env:APPDATA "venu") -Recurse -Force
-    Write-Host "Configuration removed (%APPDATA%\venu)."
+    Remove-Item (Join-Path $env:APPDATA "agent-notch") -Recurse -Force
+    Write-Host "Configuration removed (%APPDATA%\agent-notch)."
 } else {
-    Write-Host "Configuration kept at %APPDATA%\venu (use -PurgeConfig to remove)."
+    Write-Host "Configuration kept at %APPDATA%\agent-notch (use -PurgeConfig to remove)."
 }

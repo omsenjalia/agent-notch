@@ -1,7 +1,7 @@
 //! The Shelf: files, folders, apps and scripts pinned to the notch, plus the
 //! newest few files of one folder (Screenshots, Downloads…).
 //!
-//! Venu stores paths only. Nothing is copied, moved or indexed: opening an
+//! agent-notch stores paths only. Nothing is copied, moved or indexed: opening an
 //! item hands its path to Windows exactly as a double-click in Explorer
 //! would.
 //!
@@ -122,7 +122,7 @@ pub fn sync(cfg: &ShelfConfig, in_deck: bool, visible: bool) {
         None => {
             let (tx, rx) = mpsc::channel();
             let spawned = std::thread::Builder::new()
-                .name("Venu shelf".to_owned())
+                .name("agent-notch shelf".to_owned())
                 .spawn(move || run(rx))
                 .is_ok();
             if !spawned {
@@ -443,7 +443,7 @@ fn normalise_alpha(bgra: &mut [u8]) {
 pub fn open(path: &str) {
     let path = path.to_owned();
     let _ = std::thread::Builder::new()
-        .name("Venu open".to_owned())
+        .name("agent-notch open".to_owned())
         .spawn(move || unsafe {
             let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
             let file = HSTRING::from(path.as_str());
@@ -464,7 +464,7 @@ pub fn open(path: &str) {
 pub fn reveal(path: &str) {
     let path = path.to_owned();
     let _ = std::thread::Builder::new()
-        .name("Venu reveal".to_owned())
+        .name("agent-notch reveal".to_owned())
         .spawn(move || unsafe {
             let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
             let verb = HSTRING::from("open");

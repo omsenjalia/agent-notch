@@ -107,6 +107,9 @@ impl NotchManager {
                 cfg.notch.notifications.toast_duration_secs,
             )
         };
+        // Install the agent brain's global host; the Agent slide reads its
+        // status every frame.
+        crate::agent::install(&config.read().agent);
         notify::start_webhook_server(port, allowed);
         crate::native_notifications::set_toast_duration(toast_duration_secs);
         crate::native_notifications::set_enabled(windows_listener_enabled);

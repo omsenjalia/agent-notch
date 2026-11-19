@@ -1,0 +1,406 @@
+{
+  ".agents/hooks.json": {
+    "mtime": 1795062255.4110959,
+    "seen": 1795062288.4384792,
+    "ast_hash": "cd373f1042336a813459e976c8b19539",
+    "semantic_hash": "cd373f1042336a813459e976c8b19539",
+    "ast_empty": true
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1795062255.4210937,
+    "seen": 1795062288.438487,
+    "ast_hash": "9db0a3891713ff87ed0690577593fbe8",
+    "semantic_hash": "9db0a3891713ff87ed0690577593fbe8"
+  },
+  ".github/workflows/release.yml": {
+    "mtime": 1795062255.428131,
+    "seen": 1795062288.4428408,
+    "ast_hash": "44abeecac1652849fac72cf273860cf3",
+    "semantic_hash": "44abeecac1652849fac72cf273860cf3"
+  },
+  "Cargo.toml": {
+    "mtime": 1795062255.4451303,
+    "seen": 1795062288.4479902,
+    "ast_hash": "8bc53f9c2f63c5bdf8a79f906c7101a6",
+    "semantic_hash": "8bc53f9c2f63c5bdf8a79f906c7101a6"
+  },
+  "build.rs": {
+    "mtime": 1795062255.6313157,
+    "seen": 1795062288.449987,
+    "ast_hash": "1f6030171b863d9050442e2f69dbe848",
+    "semantic_hash": "1f6030171b863d9050442e2f69dbe848"
+  },
+  "fonts/SOURCE.json": {
+    "mtime": 1795062255.867174,
+    "seen": 1795062288.4519796,
+    "ast_hash": "6264f4c4a5cb5ac16a833b0758dd5a75",
+    "semantic_hash": "6264f4c4a5cb5ac16a833b0758dd5a75",
+    "ast_empty": true
+  },
+  "scripts/gen-icon.ps1": {
+    "mtime": 1795062255.87817,
+    "seen": 1795062288.4519837,
+    "ast_hash": "e3a3790257f8443a9b74870c6ac6c07f",
+    "semantic_hash": "e3a3790257f8443a9b74870c6ac6c07f"
+  },
+  "scripts/install.ps1": {
+    "mtime": 1795062255.882167,
+    "seen": 1795062288.4545908,
+    "ast_hash": "ec58ef5d308c6e89387dcc37f5f9f23d",
+    "semantic_hash": "ec58ef5d308c6e89387dcc37f5f9f23d"
+  },
+  "scripts/notch-hooks/antigravity-notify.ps1": {
+    "mtime": 1795062255.8901694,
+    "seen": 1795062288.457466,
+    "ast_hash": "acd785d73573b84994e3f8c1c1e76f23",
+    "semantic_hash": "acd785d73573b84994e3f8c1c1e76f23"
+  },
+  "scripts/notch-hooks/claude-activity.ps1": {
+    "mtime": 1795062255.896165,
+    "seen": 1795062288.4619968,
+    "ast_hash": "9d5e0018b6f6115e4d55feda2dc845f1",
+    "semantic_hash": "9d5e0018b6f6115e4d55feda2dc845f1"
+  },
+  "scripts/notch-hooks/claude-notify.ps1": {
+    "mtime": 1795062255.9006858,
+    "seen": 1795062288.466748,
+    "ast_hash": "9ce8376d555c6522fd7efc34a0ffc874",
+    "semantic_hash": "9ce8376d555c6522fd7efc34a0ffc874"
+  },
+  "scripts/notch-hooks/claude-usage.ps1": {
+    "mtime": 1795062255.906287,
+    "seen": 1795062288.4711177,
+    "ast_hash": "ecd041bed24d6f10e890e31846b6cc89",
+    "semantic_hash": "ecd041bed24d6f10e890e31846b6cc89"
+  },
+  "scripts/notch-hooks/codex-notify.ps1": {
+    "mtime": 1795062255.9112246,
+    "seen": 1795062288.475576,
+    "ast_hash": "d14414fa97016c9e5f18636942b70f53",
+    "semantic_hash": "d14414fa97016c9e5f18636942b70f53"
+  },
+  "scripts/uninstall.ps1": {
+    "mtime": 1795062255.9182918,
+    "seen": 1795062288.4799032,
+    "ast_hash": "1a9be8fbe2fe53f33a35ca4dbf85db99",
+    "semantic_hash": "1a9be8fbe2fe53f33a35ca4dbf85db99"
+  },
+  "src/autostart.rs": {
+    "mtime": 1795062255.9236257,
+    "seen": 1795062288.4825773,
+    "ast_hash": "bd7b1f47e48f0a284e8e3def00d29160",
+    "semantic_hash": "bd7b1f47e48f0a284e8e3def00d29160"
+  },
+  "src/config.rs": {
+    "mtime": 1795062255.9318035,
+    "seen": 1795062288.4855707,
+    "ast_hash": "46e5ff83a0ad6131c85d55838c5b5f32",
+    "semantic_hash": "46e5ff83a0ad6131c85d55838c5b5f32"
+  },
+  "src/flash/mod.rs": {
+    "mtime": 1795062255.9398816,
+    "seen": 1795062288.488672,
+    "ast_hash": "d8a622127033ed397b06cb93dcdaf133",
+    "semantic_hash": "d8a622127033ed397b06cb93dcdaf133"
+  },
+  "src/flash/renderer.rs": {
+    "mtime": 1795062255.947879,
+    "seen": 1795062288.4931636,
+    "ast_hash": "64212f3979bac133f12a648645e4d4ea",
+    "semantic_hash": "64212f3979bac133f12a648645e4d4ea"
+  },
+  "src/flash/window.rs": {
+    "mtime": 1795062255.952877,
+    "seen": 1795062288.4969847,
+    "ast_hash": "e86669ec8b8669674971abdf6c86b5d8",
+    "semantic_hash": "e86669ec8b8669674971abdf6c86b5d8"
+  },
+  "src/font_families.rs": {
+    "mtime": 1795062255.9568758,
+    "seen": 1795062288.5017369,
+    "ast_hash": "09bec52b93b52be3b58c8c753db7020a",
+    "semantic_hash": "09bec52b93b52be3b58c8c753db7020a"
+  },
+  "src/fonts.rs": {
+    "mtime": 1795062255.9608753,
+    "seen": 1795062288.504405,
+    "ast_hash": "0b6cbb51a523740c908074c1234d6baa",
+    "semantic_hash": "0b6cbb51a523740c908074c1234d6baa"
+  },
+  "src/gui/color_picker.rs": {
+    "mtime": 1795062255.9698706,
+    "seen": 1795062288.507459,
+    "ast_hash": "12039f9177d04769bcc3c72eb090c5ba",
+    "semantic_hash": "12039f9177d04769bcc3c72eb090c5ba"
+  },
+  "src/gui/control_pages.rs": {
+    "mtime": 1795062255.9758704,
+    "seen": 1795062288.5116308,
+    "ast_hash": "4600af6f8ae1de61a8557eb6b130bd5e",
+    "semantic_hash": "4600af6f8ae1de61a8557eb6b130bd5e"
+  },
+  "src/gui/effect_preview.rs": {
+    "mtime": 1795062255.980405,
+    "seen": 1795062288.5166128,
+    "ast_hash": "3fe8659051b545ac6adae178cdd95e3c",
+    "semantic_hash": "3fe8659051b545ac6adae178cdd95e3c"
+  },
+  "src/gui/filedlg.rs": {
+    "mtime": 1795062255.9864328,
+    "seen": 1795062288.5209386,
+    "ast_hash": "0c33cbbfe055008b025b5dc5c56411a9",
+    "semantic_hash": "0c33cbbfe055008b025b5dc5c56411a9"
+  },
+  "src/gui/font_setup.rs": {
+    "mtime": 1795062255.9914334,
+    "seen": 1795062288.525432,
+    "ast_hash": "5d27e3ce2de1fca2a46b58b3e505a92d",
+    "semantic_hash": "5d27e3ce2de1fca2a46b58b3e505a92d"
+  },
+  "src/gui/glass.rs": {
+    "mtime": 1795062255.9963381,
+    "seen": 1795062288.5298316,
+    "ast_hash": "7318bc5b529bbd464666071570e6651b",
+    "semantic_hash": "7318bc5b529bbd464666071570e6651b"
+  },
+  "src/gui/mod.rs": {
+    "mtime": 1795062256.0073373,
+    "seen": 1795062288.53447,
+    "ast_hash": "ab2951f3de32233456bef68f82e9903e",
+    "semantic_hash": "ab2951f3de32233456bef68f82e9903e"
+  },
+  "src/gui/notch_preview.rs": {
+    "mtime": 1795062256.0123348,
+    "seen": 1795062288.538476,
+    "ast_hash": "e2365520535f01096e0f17993e9dd0d7",
+    "semantic_hash": "e2365520535f01096e0f17993e9dd0d7"
+  },
+  "src/gui/theme.rs": {
+    "mtime": 1795062256.0179863,
+    "seen": 1795062288.5429468,
+    "ast_hash": "5ecfc0f5ce4eaff9e010a8a1348e8505",
+    "semantic_hash": "5ecfc0f5ce4eaff9e010a8a1348e8505"
+  },
+  "src/gui/wallpaper.rs": {
+    "mtime": 1795062256.0220544,
+    "seen": 1795062288.5472806,
+    "ast_hash": "434de4000bd51ddf612e62ee69be07b8",
+    "semantic_hash": "434de4000bd51ddf612e62ee69be07b8"
+  },
+  "src/launch.rs": {
+    "mtime": 1795062256.0271008,
+    "seen": 1795062288.5513062,
+    "ast_hash": "d4541be1b55b3594ecfceac0a8e86e28",
+    "semantic_hash": "d4541be1b55b3594ecfceac0a8e86e28"
+  },
+  "src/main.rs": {
+    "mtime": 1795062256.0321085,
+    "seen": 1795062288.5543714,
+    "ast_hash": "8399791c99f9890aef79c87970317a20",
+    "semantic_hash": "8399791c99f9890aef79c87970317a20"
+  },
+  "src/native_notifications.rs": {
+    "mtime": 1795062256.0370972,
+    "seen": 1795062288.557148,
+    "ast_hash": "c0d0c09dcf1d71b3a9a41667ae704a6f",
+    "semantic_hash": "c0d0c09dcf1d71b3a9a41667ae704a6f"
+  },
+  "src/notch/anim.rs": {
+    "mtime": 1795062256.0450947,
+    "seen": 1795062288.5599635,
+    "ast_hash": "08aa676012b5d7ef749ff22cc627b3e7",
+    "semantic_hash": "08aa676012b5d7ef749ff22cc627b3e7"
+  },
+  "src/notch/audio.rs": {
+    "mtime": 1795062256.051044,
+    "seen": 1795062288.5642278,
+    "ast_hash": "a9da6027a411d0528b372e1dadb440ef",
+    "semantic_hash": "a9da6027a411d0528b372e1dadb440ef"
+  },
+  "src/notch/backdrop.rs": {
+    "mtime": 1795062256.056042,
+    "seen": 1795062288.5685995,
+    "ast_hash": "f1517a7c11ad783435f4d483222f8ade",
+    "semantic_hash": "f1517a7c11ad783435f4d483222f8ade"
+  },
+  "src/notch/battery.rs": {
+    "mtime": 1795062256.0610466,
+    "seen": 1795062288.5729175,
+    "ast_hash": "333287ee307aea245cffc1bfb1b04f62",
+    "semantic_hash": "333287ee307aea245cffc1bfb1b04f62"
+  },
+  "src/notch/calendar.rs": {
+    "mtime": 1795062256.066041,
+    "seen": 1795062288.5772934,
+    "ast_hash": "ae3ebe06b4c85cf136fc9e5a20dd6586",
+    "semantic_hash": "ae3ebe06b4c85cf136fc9e5a20dd6586"
+  },
+  "src/notch/clipboard.rs": {
+    "mtime": 1795062256.071085,
+    "seen": 1795062288.5815759,
+    "ast_hash": "bbc803f2a1c535c2373ad999fac994b3",
+    "semantic_hash": "bbc803f2a1c535c2373ad999fac994b3"
+  },
+  "src/notch/effects.rs": {
+    "mtime": 1795062256.0780394,
+    "seen": 1795062288.5862684,
+    "ast_hash": "439b51f05738b3b04c85e2523879eb92",
+    "semantic_hash": "439b51f05738b3b04c85e2523879eb92"
+  },
+  "src/notch/geom.rs": {
+    "mtime": 1795062256.0827384,
+    "seen": 1795062288.590613,
+    "ast_hash": "718d6295ee089638975df302752f75a0",
+    "semantic_hash": "718d6295ee089638975df302752f75a0"
+  },
+  "src/notch/hook.rs": {
+    "mtime": 1795062256.0877934,
+    "seen": 1795062288.5949311,
+    "ast_hash": "fac159ee557b21668eb8c6cc7f7dd6aa",
+    "semantic_hash": "fac159ee557b21668eb8c6cc7f7dd6aa"
+  },
+  "src/notch/keys.rs": {
+    "mtime": 1795062256.092793,
+    "seen": 1795062288.5995893,
+    "ast_hash": "6cb7404d0db3e3de97839c96336c0c30",
+    "semantic_hash": "6cb7404d0db3e3de97839c96336c0c30"
+  },
+  "src/notch/layout.rs": {
+    "mtime": 1795062256.0993097,
+    "seen": 1795062288.6039681,
+    "ast_hash": "bf7ba2b5cc77d1c399c1c780adcedd1f",
+    "semantic_hash": "bf7ba2b5cc77d1c399c1c780adcedd1f"
+  },
+  "src/notch/media.rs": {
+    "mtime": 1795062256.1043124,
+    "seen": 1795062288.6078408,
+    "ast_hash": "ebd9254b8fd2a613552ab01e5f520d8f",
+    "semantic_hash": "ebd9254b8fd2a613552ab01e5f520d8f"
+  },
+  "src/notch/menu.rs": {
+    "mtime": 1795062256.1108022,
+    "seen": 1795062288.612305,
+    "ast_hash": "24d576d581fe36e67a157a21d88f8faf",
+    "semantic_hash": "24d576d581fe36e67a157a21d88f8faf"
+  },
+  "src/notch/mod.rs": {
+    "mtime": 1795062256.116006,
+    "seen": 1795062288.6167717,
+    "ast_hash": "3f667cecc7b8eef55078ab898e4a89fb",
+    "semantic_hash": "3f667cecc7b8eef55078ab898e4a89fb"
+  },
+  "src/notch/notify.rs": {
+    "mtime": 1795062256.1220055,
+    "seen": 1795062288.620866,
+    "ast_hash": "ce3599124129b0e188681a5dfbcfabf7",
+    "semantic_hash": "ce3599124129b0e188681a5dfbcfabf7"
+  },
+  "src/notch/paint.rs": {
+    "mtime": 1795062256.1322556,
+    "seen": 1795062288.6250505,
+    "ast_hash": "e832e0c1e2d7e7e63143d0a63b9449a1",
+    "semantic_hash": "e832e0c1e2d7e7e63143d0a63b9449a1"
+  },
+  "src/notch/paint_panels.rs": {
+    "mtime": 1795062256.1382575,
+    "seen": 1795062288.6290972,
+    "ast_hash": "adfca306eb06f6f4342a300ae0daa052",
+    "semantic_hash": "adfca306eb06f6f4342a300ae0daa052"
+  },
+  "src/notch/shelf.rs": {
+    "mtime": 1795062256.144513,
+    "seen": 1795062288.6342816,
+    "ast_hash": "a3ecc024a4d6465fd2fbecff3e72f131",
+    "semantic_hash": "a3ecc024a4d6465fd2fbecff3e72f131"
+  },
+  "src/notch/state.rs": {
+    "mtime": 1795062256.151317,
+    "seen": 1795062288.6387706,
+    "ast_hash": "b8d186051dfe10c505571745057e440e",
+    "semantic_hash": "b8d186051dfe10c505571745057e440e"
+  },
+  "src/notch/surface.rs": {
+    "mtime": 1795062256.1572115,
+    "seen": 1795062288.642935,
+    "ast_hash": "f972b4ed9d621103a7cd05ff8501a3d4",
+    "semantic_hash": "f972b4ed9d621103a7cd05ff8501a3d4"
+  },
+  "src/notch/text.rs": {
+    "mtime": 1795062256.1623707,
+    "seen": 1795062288.6476433,
+    "ast_hash": "b96afe1465beba455e7909882e0f83d0",
+    "semantic_hash": "b96afe1465beba455e7909882e0f83d0"
+  },
+  "src/notch/theme.rs": {
+    "mtime": 1795062256.16815,
+    "seen": 1795062288.6520991,
+    "ast_hash": "98b098acd0442c5a9452af82085044a6",
+    "semantic_hash": "98b098acd0442c5a9452af82085044a6"
+  },
+  "src/notch/timer.rs": {
+    "mtime": 1795062256.173149,
+    "seen": 1795062288.6563294,
+    "ast_hash": "5a0ffcdccb9f3a837ecc9873c5dc06e6",
+    "semantic_hash": "5a0ffcdccb9f3a837ecc9873c5dc06e6"
+  },
+  "src/notch/toggles.rs": {
+    "mtime": 1795062256.1781528,
+    "seen": 1795062288.660589,
+    "ast_hash": "24f8cea63ab756d16b59894cd4d2dfc4",
+    "semantic_hash": "24f8cea63ab756d16b59894cd4d2dfc4"
+  },
+  "src/notch/window.rs": {
+    "mtime": 1795062256.1862693,
+    "seen": 1795062288.6643434,
+    "ast_hash": "ceab0ace15ddf35afb8e3cf7dd93b0e9",
+    "semantic_hash": "ceab0ace15ddf35afb8e3cf7dd93b0e9"
+  },
+  "src/overlay/d2d_renderer.rs": {
+    "mtime": 1795062256.1951764,
+    "seen": 1795062288.6691148,
+    "ast_hash": "0ee658159a127079ee0ac5d2a7fb9e37",
+    "semantic_hash": "0ee658159a127079ee0ac5d2a7fb9e37"
+  },
+  "src/overlay/mod.rs": {
+    "mtime": 1795062256.2022734,
+    "seen": 1795062288.6738868,
+    "ast_hash": "b33ecb0b1b9c773e0e8306f0bdb758f3",
+    "semantic_hash": "b33ecb0b1b9c773e0e8306f0bdb758f3"
+  },
+  "src/overlay/win32_window.rs": {
+    "mtime": 1795062256.2070036,
+    "seen": 1795062288.6782572,
+    "ast_hash": "6eb72318122352fb4e1636ebb88ff1d6",
+    "semantic_hash": "6eb72318122352fb4e1636ebb88ff1d6"
+  },
+  "src/startup_log.rs": {
+    "mtime": 1795062256.2120044,
+    "seen": 1795062288.6826775,
+    "ast_hash": "b3551952bfd67eab9608e3fb74ac7eb0",
+    "semantic_hash": "b3551952bfd67eab9608e3fb74ac7eb0"
+  },
+  "src/stats.rs": {
+    "mtime": 1795062256.215998,
+    "seen": 1795062288.6855783,
+    "ast_hash": "df77c4fa1a606d4c31530902c581c2a4",
+    "semantic_hash": "df77c4fa1a606d4c31530902c581c2a4"
+  },
+  "src/stats_math.rs": {
+    "mtime": 1795062256.219307,
+    "seen": 1795062288.688395,
+    "ast_hash": "eeb4d52e63a75f6339822617fb723966",
+    "semantic_hash": "eeb4d52e63a75f6339822617fb723966"
+  },
+  "src/tray.rs": {
+    "mtime": 1795062256.2236335,
+    "seen": 1795062288.690993,
+    "ast_hash": "415eebcecd41ec1a6a361f002b1202a1",
+    "semantic_hash": "415eebcecd41ec1a6a361f002b1202a1"
+  },
+  "tests/startup_smoke.rs": {
+    "mtime": 1795062256.2316024,
+    "seen": 1795062288.6938784,
+    "ast_hash": "bd6261025a61fb845e1422e1688899fc",
+    "semantic_hash": "bd6261025a61fb845e1422e1688899fc"
+  }
+}

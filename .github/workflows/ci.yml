@@ -32,7 +32,7 @@ jobs:
           if ($actualHash -ne '351fc8c8b695878ffb3eaa044b3ead08672a48b1a045e3c3e3975811df0f6695') {
             throw "Mesa archive SHA256 mismatch: $actualHash"
           }
-          $extractDir = Join-Path $env:RUNNER_TEMP "venu-mesa-$version"
+          $extractDir = Join-Path $env:RUNNER_TEMP "agent-notch-mesa-$version"
           New-Item -ItemType Directory -Force -Path $extractDir | Out-Null
           $sevenZip = Join-Path $env:ProgramFiles '7-Zip\7z.exe'
           & $sevenZip x $archive 'x64/opengl32.dll' 'x64/libgallium_wgl.dll' "-o$extractDir" -y | Out-Null
@@ -46,7 +46,7 @@ jobs:
       - name: Test
         run: cargo test --locked
         env:
-          VENU_STARTUP_TEST_OPENGL_DIR: ${{ runner.temp }}\venu-mesa-26.2.4\x64
+          VENU_STARTUP_TEST_OPENGL_DIR: ${{ runner.temp }}\agent-notch-mesa-26.2.4\x64
           GALLIUM_DRIVER: llvmpipe
           LIBGL_ALWAYS_SOFTWARE: '1'
 
@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: startup-smoke-diagnostics
-          path: ${{ runner.temp }}/venu-startup-smoke-*
+          path: ${{ runner.temp }}/agent-notch-startup-smoke-*
           if-no-files-found: ignore
 
       - name: Check formatting

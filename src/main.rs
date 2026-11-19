@@ -1,3 +1,4 @@
+mod agent;
 mod autostart;
 mod config;
 mod flash;
@@ -29,7 +30,7 @@ const FRAME_MS: u32 = 16;
 
 /// Interval the overlay thread falls back to once nothing is animating.
 ///
-/// Venu spends nearly all of its life like this: a collapsed pill showing the
+/// agent-notch spends nearly all of its life like this: a collapsed pill showing the
 /// same thing it showed a second ago. A tick at this rate reads the cursor,
 /// drains the input bus and advances the springs — all of it arithmetic and a
 /// syscall or two — and paints nothing, so the notch still opens the instant
@@ -45,7 +46,7 @@ use notch::NotchManager;
 use overlay::OverlayManager;
 use tray::SystemTray;
 
-/// The Venu logo, for the Settings window title bar and taskbar button.
+/// The agent-notch logo, for the Settings window title bar and taskbar button.
 ///
 /// Decoded from the same PNG that `scripts/gen-icon.ps1` builds the exe icon
 /// from, and scaled to 64px: large enough for the taskbar at 200% scaling,
@@ -69,7 +70,7 @@ fn create_app_icon_data() -> Option<egui::IconData> {
 /// finds it taken and quietly exits instead of fighting over the notch.
 fn acquire_single_instance() -> bool {
     unsafe {
-        let name = HSTRING::from("Local\\Venu.SingleInstance");
+        let name = HSTRING::from("Local\\agent-notch.SingleInstance");
         match CreateMutexW(None, false, PCWSTR(name.as_ptr())) {
             Ok(handle) => {
                 // Bound but never closed: the mutex must outlive `main`, and
@@ -87,12 +88,12 @@ fn acquire_single_instance() -> bool {
 /// Keep launch-on-startup and the saved preference in step.
 ///
 /// Store build: Windows owns the startup task, so the preference simply
-/// follows what Windows says — including the user switching Venu off in
+/// follows what Windows says — including the user switching agent-notch off in
 /// Settings › Apps › Startup. Nothing is ever switched on from here.
 ///
 /// Registry build:
 /// - Preference on: rewrite the entry every run, so an updated or moved
-///   `venu.exe` never leaves a stale path registered for sign-in.
+///   `agent-notch.exe` never leaves a stale path registered for sign-in.
 /// - Preference off but an entry exists: the installer wrote it, or the
 ///   config file was reset. Adopt it, so the toggle in Preferences matches
 ///   what actually happens at sign-in.
@@ -187,7 +188,7 @@ fn run_overlay_thread(overlay_config: Arc<RwLock<AppConfig>>) {
         last_instant = now;
 
         // Each of these reports whether it still has something in flight.
-        // None of them do while Venu sits in the tray with the notch shut,
+        // None of them do while agent-notch sits in the tray with the notch shut,
         // which is the state it is in almost all of the time.
         let mut animating = {
             let cfg = overlay_config.read();
@@ -238,7 +239,7 @@ fn main() {
     // Spawn Overlay Render, System Tray & Win32 Message Loop thread.
     let overlay_config = Arc::clone(&config);
     let overlay_thread = std::thread::Builder::new()
-        .name("Venu overlay".to_owned())
+        .name("agent-notch overlay".to_owned())
         .spawn(move || {
             if std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 run_overlay_thread(overlay_config)
@@ -292,7 +293,7 @@ fn main() {
     // them thin. It draws its own title bar so the glass runs edge to edge.
     let pinned = config.read().settings_window.pinned;
     let mut viewport_builder = eframe::egui::ViewportBuilder::default()
-        .with_title("Venu - Settings")
+        .with_title("agent-notch - Settings")
         .with_inner_size(gui::WINDOW_SIZE)
         .with_min_inner_size(gui::MIN_WINDOW_SIZE)
         .with_resizable(true)
@@ -317,7 +318,7 @@ fn main() {
 
     let gui_config = Arc::clone(&config);
     if let Err(error) = eframe::run_native(
-        "Venu",
+        "agent-notch",
         native_options,
         Box::new(move |cc| Ok(Box::new(SettingsApp::new(cc, gui_config, show_settings)))),
     ) {

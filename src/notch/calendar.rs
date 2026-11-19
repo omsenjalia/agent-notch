@@ -1,6 +1,6 @@
 //! The Calendar slide's events, read from an iCal feed.
 //!
-//! Windows only lets packaged apps read the system calendar, so Venu reads
+//! Windows only lets packaged apps read the system calendar, so agent-notch reads
 //! the same thing every calendar service can publish instead: an `.ics`
 //! address (Google Calendar's "secret address in iCal format", Outlook's
 //! "publish calendar" ICS link) or a local `.ics` file.
@@ -67,7 +67,7 @@ fn wanted() -> &'static (Mutex<Wanted>, Condvar) {
     static WANTED: OnceLock<(Mutex<Wanted>, Condvar)> = OnceLock::new();
     WANTED.get_or_init(|| {
         std::thread::Builder::new()
-            .name("venu-calendar".into())
+            .name("agent-notch-calendar".into())
             .spawn(fetch_loop)
             .ok();
         (

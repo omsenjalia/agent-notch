@@ -1,4 +1,4 @@
-# Generates assets\venu.ico from assets\icon.png, the Venu logo (the same
+# Generates assets\agent-notch.ico from assets\icon.png, the agent-notch logo (the same
 # transparent cut-out the website uses as its favicon).
 #
 # The ICO carries one PNG-compressed entry per size Windows asks for — taskbar,
@@ -49,6 +49,6 @@ foreach ($e in $entries) {
 foreach ($e in $entries) { $w.Write($e.Png) }
 $w.Flush()
 
-$dest = Join-Path $root "assets\venu.ico"
+$dest = Join-Path $root "assets\agent-notch.ico"
 [System.IO.File]::WriteAllBytes($dest, $out.ToArray())
 Write-Host ("Wrote {0} ({1} bytes, sizes {2})" -f $dest, $out.Length, ($sizes -join ", "))

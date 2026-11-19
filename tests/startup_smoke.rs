@@ -13,7 +13,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
 };
 
 const TRAY_TITLE: &str = "VenuTray";
-const SETTINGS_TITLE: &str = "Venu - Settings";
+const SETTINGS_TITLE: &str = "agent-notch - Settings";
 // Must stay in sync with WM_TRAY_ICON in src/tray.rs.
 const WM_TRAY_ICON: u32 = WM_USER + 101;
 const POLL_INTERVAL: Duration = Duration::from_millis(100);
@@ -43,10 +43,10 @@ impl SoftwareOpenGlRuntime {
         else {
             return runtime;
         };
-        let executable = PathBuf::from(env!("CARGO_BIN_EXE_venu"));
+        let executable = PathBuf::from(env!("CARGO_BIN_EXE_agent-notch"));
         let executable_dir = executable
             .parent()
-            .expect("Venu executable has a parent directory");
+            .expect("agent-notch executable has a parent directory");
 
         for file_name in ["opengl32.dll", "libgallium_wgl.dll"] {
             let source = source_dir.join(file_name);
@@ -82,7 +82,7 @@ impl ChildProcess {
             .map(PathBuf::from)
             .unwrap_or_else(std::env::temp_dir);
         let diagnostic_dir = temp_root.join(format!(
-            "venu-startup-smoke-{}-{label}-{nonce}",
+            "agent-notch-startup-smoke-{}-{label}-{nonce}",
             std::process::id()
         ));
         let local_app_data = diagnostic_dir.join("LocalAppData");
@@ -92,7 +92,7 @@ impl ChildProcess {
 
         let stdout = File::create(diagnostic_dir.join("stdout.log")).expect("create stdout log");
         let stderr = File::create(diagnostic_dir.join("stderr.log")).expect("create stderr log");
-        let child = Command::new(env!("CARGO_BIN_EXE_venu"))
+        let child = Command::new(env!("CARGO_BIN_EXE_agent-notch"))
             .args(args)
             .env("APPDATA", roaming_app_data)
             .env("LOCALAPPDATA", local_app_data)
@@ -100,7 +100,7 @@ impl ChildProcess {
             .stdout(Stdio::from(stdout))
             .stderr(Stdio::from(stderr))
             .spawn()
-            .expect("Venu should start");
+            .expect("agent-notch should start");
         Self {
             child,
             diagnostic_dir,
@@ -119,7 +119,7 @@ impl ChildProcess {
             .expect("query child process")
             .is_some()
         {
-            panic!("Venu exited during {phase}.\n{}", self.diagnostics(phase));
+            panic!("agent-notch exited during {phase}.\n{}", self.diagnostics(phase));
         }
     }
 
@@ -143,7 +143,7 @@ impl ChildProcess {
             &self
                 .diagnostic_dir
                 .join("LocalAppData")
-                .join("Venu")
+                .join("agent-notch")
                 .join("startup.log"),
         );
         let stdout = read_diagnostic_file(&self.diagnostic_dir.join("stdout.log"));
@@ -179,7 +179,7 @@ impl ChildProcess {
             .expect("create secondary stdout log");
         let stderr = File::create(self.diagnostic_dir.join(format!("{label}.stderr.log")))
             .expect("create secondary stderr log");
-        let mut child = Command::new(env!("CARGO_BIN_EXE_venu"))
+        let mut child = Command::new(env!("CARGO_BIN_EXE_agent-notch"))
             .args(args)
             .env("APPDATA", self.diagnostic_dir.join("AppData"))
             .env("LOCALAPPDATA", self.diagnostic_dir.join("LocalAppData"))
@@ -187,7 +187,7 @@ impl ChildProcess {
             .stdout(Stdio::from(stdout))
             .stderr(Stdio::from(stderr))
             .spawn()
-            .expect("launch secondary Venu request");
+            .expect("launch secondary agent-notch request");
         let deadline = Instant::now() + WINDOW_TIMEOUT;
         loop {
             if let Some(status) = child.try_wait().expect("query secondary process") {
@@ -197,7 +197,7 @@ impl ChildProcess {
                 let _ = child.kill();
                 let status = child.wait().ok();
                 panic!(
-                    "secondary Venu request {args:?} did not exit within {WINDOW_TIMEOUT:?} (status {status:?}).\n{}",
+                    "secondary agent-notch request {args:?} did not exit within {WINDOW_TIMEOUT:?} (status {status:?}).\n{}",
                     self.diagnostics(label)
                 );
             }

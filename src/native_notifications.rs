@@ -131,7 +131,7 @@ fn worker_sender() -> Option<&'static SyncSender<Command>> {
     if WORKER.set(sender.clone()).is_ok() {
         let worker_sender = sender.clone();
         if thread::Builder::new()
-            .name("Venu Windows notifications".to_owned())
+            .name("agent-notch Windows notifications".to_owned())
             .spawn(move || worker_loop(receiver, worker_sender))
             .is_err()
         {

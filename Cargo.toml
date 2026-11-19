@@ -1,5 +1,5 @@
 [package]
-name = "venu"
+name = "agent-notch"
 version = "0.6.1"
 edition = "2021"
 description = "A sleek, hardware-accelerated Dynamic Notch for Windows with live background blur, media controls, multi-glass finishes, and desktop notifications."
@@ -22,6 +22,11 @@ image = { version = "0.25", default-features = false, features = [
     "gif",
     "webp",
 ] }
+
+# Agent brain: HTTPS providers (OpenRouter, Groq, ...).
+ureq = "2"
+# Screenshots become base64 data URIs for vision-capable models.
+base64 = "0.22"
 
 [dependencies.windows]
 version = "0.58"
@@ -69,6 +74,6 @@ features = [
 ]
 
 [build-dependencies]
-# Embeds the version resource and app icon into venu.exe, so Explorer, the
+# Embeds the version resource and app icon into agent-notch.exe, so Explorer, the
 # Start Menu and the installer can all see what they are looking at.
 winresource = "0.1"

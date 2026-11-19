@@ -1,10 +1,10 @@
-# Claude Code UserPromptSubmit hook -> Venu "agent working" pod.
+# Claude Code UserPromptSubmit hook -> agent-notch "agent working" pod.
 # Registered in ~/.claude/settings.json under hooks.UserPromptSubmit.
 #
-# Tells Venu that Claude has started on a prompt, so a satellite pod beside
+# Tells agent-notch that Claude has started on a prompt, so a satellite pod beside
 # the notch can show how long it has been working. Nothing extra is needed to
 # end it: the Stop hook (claude-notify.ps1) posts a "success" notification,
-# which closes the pod. Venu also drops any activity it hears nothing about
+# which closes the pod. agent-notch also drops any activity it hears nothing about
 # for an hour.
 
 $ErrorActionPreference = 'SilentlyContinue'

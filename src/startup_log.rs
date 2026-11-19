@@ -64,7 +64,7 @@ fn write_record(event: &str) {
     let Some(local_data) = local_data_directory() else {
         return;
     };
-    let path = local_data.join("Venu").join("startup.log");
+    let path = local_data.join("agent-notch").join("startup.log");
     let lock = LOG_LOCK.get_or_init(|| Mutex::new(()));
     let _guard = lock.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
 

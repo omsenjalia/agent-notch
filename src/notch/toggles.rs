@@ -133,7 +133,7 @@ pub fn flip(toggle: Toggle) {
             let awake = !KEEP_AWAKE.load(Ordering::Relaxed);
             KEEP_AWAKE.store(awake, Ordering::Relaxed);
             // Applies to the calling thread for as long as it lives, which
-            // for the overlay thread is as long as Venu runs.
+            // for the overlay thread is as long as agent-notch runs.
             unsafe {
                 SetThreadExecutionState(if awake {
                     ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED

@@ -87,7 +87,7 @@ mod tests {
 
         let output = ctx.run(egui::RawInput::default(), |ctx| {
             egui::CentralPanel::default().show(ctx, |ui| {
-                ui.label("Venu settings");
+                ui.label("agent-notch settings");
                 ui.monospace("CPU 0.0% · नमस्ते");
             });
         });
@@ -97,7 +97,7 @@ mod tests {
             "the headless frame should paint text"
         );
         ctx.fonts(|fonts| {
-            assert!(fonts.has_glyphs(&FontId::proportional(18.0), "Venu नमस्ते"));
+            assert!(fonts.has_glyphs(&FontId::proportional(18.0), "agent-notch नमस्ते"));
             assert!(fonts.has_glyphs(&FontId::monospace(18.0), "CPU 0.0% नमस्ते"));
             // From Windows' own emoji font; egui's bundled set lacks it.
             assert!(fonts.has_glyphs(&FontId::proportional(18.0), "\u{1F64F}"));

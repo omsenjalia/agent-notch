@@ -60,7 +60,7 @@ measured here; no CPU percentage improvement is claimed.
 
 ## Measure on Windows
 
-Build main and this branch with `cargo build --release --locked`. Fully exit Venu
+Build main and this branch with `cargo build --release --locked`. Fully exit agent-notch
 using its tray menu before switching binaries; closing Settings only hides it,
 and the single-instance mutex otherwise leaves the old executable running.
 Keep the same saved configuration and use the same machine for both builds.
@@ -79,8 +79,8 @@ This PowerShell sample reports average CPU over 30 seconds, normalized across
 logical processors like Task Manager:
 
 ```powershell
-$venuProcess = @(Get-Process -Name venu -ErrorAction Stop)
-if ($venuProcess.Count -ne 1) { throw "Expected exactly one Venu process" }
+$venuProcess = @(Get-Process -Name agent-notch -ErrorAction Stop)
+if ($venuProcess.Count -ne 1) { throw "Expected exactly one agent-notch process" }
 $venuProcess = $venuProcess[0]
 $logicalProcessors = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
 $cpuStart = $venuProcess.TotalProcessorTime.TotalSeconds
@@ -93,7 +93,7 @@ $cpuDelta = $venuProcess.TotalProcessorTime.TotalSeconds - $cpuStart
 ```
 
 Repeat each sample three times. If CPU remains high, record a CPU Usage sampling
-trace with Windows Performance Recorder and inspect Venu's stacks in Windows
+trace with Windows Performance Recorder and inspect agent-notch's stacks in Windows
 Performance Analyzer. In particular, distinguish the overlay thread's
 DirectWrite/GDI/Direct2D work from the Settings thread's egui/OpenGL work and
 the media poller's WinRT calls before choosing the next optimization.

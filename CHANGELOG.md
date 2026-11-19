@@ -1,6 +1,6 @@
 # Changelog
 
-What's new in each version of Venu, written for the people who use it.
+What's new in each version of agent-notch, written for the people who use it.
 
 ## [0.6.1] - 2026-10-27
 
@@ -18,7 +18,7 @@ What's new in each version of Venu, written for the people who use it.
   Settings, so it stays readable on any wallpaper or theme.
 - Options you can combine in Settings › General › Controls (open with, close
   with, where the menu and the scroll wheel work) are now on/off switches.
-- Release builds can be code-signed, so Windows can show Venu's publisher
+- Release builds can be code-signed, so Windows can show agent-notch's publisher
   instead of an unknown-app warning once signing is set up.
 
 ## [0.6.0] - 2026-10-27
@@ -38,7 +38,7 @@ The notch is now as easy to click as it is to hover, and it does a lot more.
 - **Keyboard shortcuts** you record yourself, such as Ctrl + Alt + N to open or
   close the notch.
 - **Shelf:** pin files, folders, apps and scripts, plus the newest files of a
-  folder like Screenshots. Drop files on the notch to pin them. Venu keeps the
+  folder like Screenshots. Drop files on the notch to pin them. agent-notch keeps the
   path only, never a copy.
 - **Clipboard history** (off by default, memory only): one click copies an
   earlier snippet again.
@@ -57,7 +57,7 @@ The notch is now as easy to click as it is to hover, and it does a lot more.
 - Settings can be resized, scrolls in every direction, shows every tab, and
   takes a soft tint of your accent colour.
 - In the Microsoft Store version, starting with Windows uses Windows' own
-  startup setting and respects it if you turn Venu off there.
+  startup setting and respects it if you turn agent-notch off there.
 
 ### Fixed
 - Even padding at both ends of a split pill, and moving text sized to fit.
@@ -65,9 +65,9 @@ The notch is now as easy to click as it is to hover, and it does a lot more.
 ## [0.5.2] - 2026-10-21
 
 ### Improved
-- **Lighter, quicker start-up.** When you sign in to Windows, Venu now starts
+- **Lighter, quicker start-up.** When you sign in to Windows, agent-notch now starts
   with just the notch and its tray icon. The Settings window is only created
-  the first time you open it, so Venu uses less memory while it sits in the
+  the first time you open it, so agent-notch uses less memory while it sits in the
   tray, and Settings reliably comes back when you open it again from the tray.
 
 ## [0.5.1] - 2026-10-21
@@ -138,7 +138,7 @@ effects for the notch, and a lighter, smoother notch overall.
   open or closed.
 - **Uses less of your PC.** The notch only redraws when something on it
   actually changes, and reads GPU activity less often.
-- **New icon.** Venu now uses its own logo in the taskbar, the tray, the
+- **New icon.** agent-notch now uses its own logo in the taskbar, the tray, the
   Start menu and the installer.
 
 ## [0.4.3]

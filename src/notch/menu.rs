@@ -414,7 +414,7 @@ mod tests {
                 },
             ),
             MenuRow::Separator,
-            MenuRow::danger(MenuCommand::Quit, "Quit Venu", glyph::POWER),
+            MenuRow::danger(MenuCommand::Quit, "Quit agent-notch", glyph::POWER),
         ]
     }
 

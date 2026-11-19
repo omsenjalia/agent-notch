@@ -100,7 +100,7 @@ pub fn sync(enabled: bool, max_items: u32) {
             // does not start a second one.
             *listener = Some(0);
             let _ = std::thread::Builder::new()
-                .name("Venu clipboard".to_owned())
+                .name("agent-notch clipboard".to_owned())
                 .spawn(run);
         }
         (false, Some(hwnd)) => {
@@ -433,7 +433,7 @@ pub fn copy_text(text: &str) -> bool {
 pub fn copy_file(path: &str) {
     let path = path.to_owned();
     let _ = std::thread::Builder::new()
-        .name("Venu copy".to_owned())
+        .name("agent-notch copy".to_owned())
         .spawn(move || {
             let mut blocks = vec![(CF_HDROP, drop_files(&path))];
             let lower = path.to_ascii_lowercase();

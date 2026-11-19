@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" role="img" aria-labelledby="title desc">
-  <title id="title">Venu whole-PC Stats visual mockup</title>
+  <title id="title">agent-notch whole-PC Stats visual mockup</title>
   <desc id="desc">An illustrative, dark-theme mockup of the collapsed notch metrics and expanded whole-system overview. All displayed readings are sample values, not measured telemetry.</desc>
   <defs>
     <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
@@ -38,7 +38,7 @@
   <circle cx="210" cy="645" r="220" fill="#7773a8" opacity=".075" filter="url(#shadow)"/>
 
   <g class="ui">
-    <text x="88" y="90" fill="#f5f4f6" font-size="17" font-weight="700" letter-spacing=".8">VENU</text>
+    <text x="88" y="90" fill="#f5f4f6" font-size="17" font-weight="700" letter-spacing=".8">agent-notch</text>
     <text x="88" y="124" fill="#f5f4f6" font-size="31" font-weight="620">Whole-PC Stats</text>
     <text x="88" y="151" class="quiet" font-size="14">A quiet system overview, composed for the notch.</text>
     <rect x="1124" y="82" width="228" height="32" rx="16" fill="#ffffff" fill-opacity=".06" stroke="#ffffff" stroke-opacity=".13"/>

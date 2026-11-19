@@ -36,7 +36,7 @@
   <!-- Top Display Bezel Reference Line -->
   <path d="M 40 48 L 216 48" stroke="#1E2638" stroke-width="3" stroke-linecap="round"/>
 
-  <!-- Floating Dynamic Island (Venu Notch) -->
+  <!-- Floating Dynamic Island (agent-notch Notch) -->
   <rect x="44" y="60" width="168" height="60" rx="30" fill="url(#notchSurface)" stroke="url(#iconGlow)" stroke-width="2.5"/>
 
   <!-- Specular Rim Light -->

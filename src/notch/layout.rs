@@ -61,6 +61,7 @@ pub fn segment_width(kind: SlideKind) -> f32 {
         SlideKind::Stats => 210.0,
         SlideKind::Shelf => 140.0,
         SlideKind::Clipboard => 180.0,
+        SlideKind::Agent => 136.0,
     }
 }
 
