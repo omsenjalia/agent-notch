@@ -2,6 +2,13 @@
 
 What's new in each version of agent-notch, written for the people who use it.
 
+## [0.6.7] - 2026-11-19
+
+### Fixed
+- Clicking the notch's focus line or "add item" row while composing an agent
+  chat now switches to that field. Previously only the reverse worked, and the
+  new regression test caught the asymmetry.
+
 ## [0.6.6] - 2026-11-19
 
 ### Fixed

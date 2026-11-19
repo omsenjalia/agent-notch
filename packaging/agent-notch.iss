@@ -1,6 +1,6 @@
 ; Inno Setup script for agent-notch - per-user install, no elevation required.
 ;
-; Build:  iscc /DMyAppVersion=0.6.6 packaging\agent-notch.iss
+; Build:  iscc /DMyAppVersion=0.6.7 packaging\agent-notch.iss
 ; (the version define is optional; release.yml passes the tag version)
 ;
 ; Layout mirrors what the app expects:
@@ -10,7 +10,7 @@
 ;     it after the install
 
 #ifndef MyAppVersion
-#define MyAppVersion "0.6.6"
+#define MyAppVersion "0.6.7"
 #endif
 
 #define MyAppName "agent-notch"

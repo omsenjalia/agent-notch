@@ -631,8 +631,11 @@ impl NotchState {
         // Re-clicking a field grabs focus again, so renew the guard even when
         // that field is already being edited.
         self.edit_focus_guard = EDIT_FOCUS_GUARD_TICKS;
-        if self.editing {
+        if self.editing && self.edit_target == EditTarget::Focus {
             return;
+        }
+        if self.editing {
+            self.cancel_edit();
         }
         self.editing = true;
         self.edit_target = EditTarget::Focus;
@@ -668,8 +671,11 @@ impl NotchState {
     /// Start typing a new item for the short list.
     pub fn begin_add(&mut self) {
         self.edit_focus_guard = EDIT_FOCUS_GUARD_TICKS;
-        if self.editing {
+        if self.editing && self.edit_target == EditTarget::NewItem {
             return;
+        }
+        if self.editing {
+            self.cancel_edit();
         }
         self.editing = true;
         self.edit_target = EditTarget::NewItem;
