@@ -5,7 +5,7 @@
 <h1 align="center">agent-notch</h1>
 
 <p align="center">
-  <strong>Dynamic Notch for Windows</strong>
+  <strong>Dynamic Agentic Notch for Windows</strong>
 </p>
 
 <p align="center">
