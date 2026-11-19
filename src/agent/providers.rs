@@ -116,15 +116,14 @@ impl Health {
         self.last_error = Some(error.clone());
     }
 
-    /// Whether the chain may use this provider right now: healthy and not
-    /// in a backoff window.
+    /// Whether the chain may use this provider right now: outside any
+    /// backoff window (after one expires the provider is usable again), or
+    /// healthy when there is no backoff.
     pub fn available(&self) -> bool {
-        if let Some(until) = self.down_until {
-            if Instant::now() < until {
-                return false;
-            }
+        match self.down_until {
+            Some(until) => Instant::now() >= until,
+            None => self.healthy,
         }
-        self.healthy
     }
 }
 
