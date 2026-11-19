@@ -2,7 +2,7 @@
 
 What's new in each version of agent-notch, written for the people who use it.
 
-## Unreleased
+## [0.6.4] - 2026-11-19
 
 ### New
 - **Chat with the agent in the notch.** The Agent slide now has a message box:
