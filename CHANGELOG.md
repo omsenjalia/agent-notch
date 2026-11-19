@@ -2,6 +2,12 @@
 
 What's new in each version of agent-notch, written for the people who use it.
 
+## [0.6.8] - 2026-11-19
+
+### Fixed
+- Corrected the 0.6.4 release note: keeping a model warm applies to selecting
+  it (and "Reload model"), not to every chat call. No code change.
+
 ## [0.6.7] - 2026-11-19
 
 ### Fixed
@@ -39,8 +45,9 @@ What's new in each version of agent-notch, written for the people who use it.
   there. The right-click menu has a "Chat with the agent" shortcut.
 - **Ollama models are discovered for you.** Settings › Agent fetches the model
   list from `http://127.0.0.1:11434/v1/models` automatically. Pick a model and
-  it is loaded into Ollama at once and kept warm for 10 minutes, including on
-  every later chat call.
+  it is loaded into Ollama at once and kept warm for 10 minutes. (From 0.6.6
+  onward the warm call happens on selection and "Reload model"; chat requests
+  are strict OpenAI-compatible JSON.)
 
 ### Improved
 - Settings › Agent is now a short guided setup. The conversation stays on
